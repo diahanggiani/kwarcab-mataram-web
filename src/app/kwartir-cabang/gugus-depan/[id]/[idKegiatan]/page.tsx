@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import { Loader2, Upload } from "lucide-react";
 import {
   Table,
@@ -112,14 +112,14 @@ export default function DetailKegiatan() {
             </div>
             <h2 className="text-xl font-bold mt-2">File Laporan Kegiatan</h2>
             <div className="flex items-center border border-gray-500 rounded-lg px-3 py-2 mt-2">
-              <Link
+              <a
                 href={kegiatan?.laporan || "#"}
                 download
                 className="bg-gray-700 text-white text-sm px-3 py-1 rounded-md flex items-center gap-1 cursor-pointer hover:bg-gray-900 transition"
               >
                 <Upload className="w-4 h-4" />
                 Download File
-              </Link>
+              </a>
               <span className="flex-grow text-gray-700 text-sm ml-3 truncate">
                 {kegiatan?.laporan
                   ? kegiatan.laporan.split("/").pop()

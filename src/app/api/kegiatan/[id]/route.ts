@@ -114,8 +114,8 @@ export async function GET(
     const fileBuffer = await data.arrayBuffer(); // pastikan ini mengonversi data ke buffer
     return new NextResponse(fileBuffer, {
       headers: {
-        "Content-Type": "application/pdf", // Pastikan MIME type sesuai dengan file
-        "Content-Disposition": `attachment; filename="${path.basename(filePath)}"`, // Menambahkan nama file
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${path.basename(filePath)}"`,
       },
     });
 
