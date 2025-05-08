@@ -92,7 +92,32 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(kegiatan);
+    // mengambil URL public file laporan dari Supabase
+    const fileUrl = kegiatan.laporan;
+
+    // pastikan file berada dalam folder 'laporan-kegiatan'
+    const filePath = `laporan-kegiatan/${fileUrl}`;
+
+    // ambil file dari Supabase menggunakan path yang benar
+    const { data, error } = await supabase.storage
+      .from("file-bucket-nextjs")
+      .download(filePath);
+
+    if (error || !data) {
+      return NextResponse.json(
+        { message: "Failed to download file" },
+        { status: 500 }
+      );
+    }
+
+    // return NextResponse.json(kegiatan);
+    // Mengatur header untuk file yang akan didownload
+    return new NextResponse(data, {
+      headers: {
+        "Content-Type": "application/pdf", // Ubah jika file selain PDF
+        "Content-Disposition": `attachment; filename="${path.basename(filePath)}"`,
+      },
+    });
   } catch (error) {
     console.error("Error retrieving activity details:", error);
     return NextResponse.json(
