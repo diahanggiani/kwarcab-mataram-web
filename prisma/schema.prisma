@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER_SUPERADMIN
+  USER_KWARCAB
+  USER_KWARAN
+  USER_GUSDEP
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relasi ke entitas yang memiliki user
+  kwarcab    Kwarcab?    @relation("KwarcabToUser")
+  kwaran     Kwaran?     @relation("KwaranToUser")
+  gugusDepan GugusDepan? @relation("GusdepToUser")
+
+  // user pembuat
+  createdBy    User?   @relation("UserCreatedBy", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  createdById  String?
+  createdUsers User[]  @relation("UserCreatedBy")
+
+  // entitas yang dibuat user ini
+  createdKwarcab    Kwarcab[]    @relation("CreatedKwarcab")
+  createdKwaran     Kwaran[]     @relation("CreatedKwaran")
+  createdGugusDepan GugusDepan[] @relation("CreatedGugusDepan")
+}
+
+model Kwarcab {
+  kode_kwarcab   String  @id
+  nama_kwarcab   String  @unique
+  alamat         String?
+  kepala_kwarcab String?
+  foto_kwarcab   String? @db.Text
+
+  kegiatan Kegiatan[]
+  ajuan    Ajuan[]
+  kwaran   Kwaran[]
+
+  userId String? @unique
+  user   User?   @relation("KwarcabToUser", fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  createdById String?
+  createdBy   User?   @relation("CreatedKwarcab", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+}
+
+model Kwaran {
+  kode_kwaran   String  @id
+  nama_kwaran   String  @unique
+  alamat        String?
+  kepala_kwaran String?
+  foto_kwaran   String? @db.Text
+
+  kegiatan   Kegiatan[]
+  gugusDepan GugusDepan[]
+
+  kwarcabKode String
+  kwarcab     Kwarcab @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
+
+  userId String? @unique
+  user   User?   @relation("KwaranToUser", fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  createdById String?
+  createdBy   User?   @relation("CreatedKwaran", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+}
+
+model GugusDepan {
+  kode_gusdep    String  @id
+  nama_gusdep    String  @unique
+  npsn           String? @unique
+  nama_sekolah   String?
+  alamat         String?
+  kepala_sekolah String?
+  foto_gusdep    String? @db.Text
+
+  anggota  Anggota[]
+  pembina  Pembina[]
+  kegiatan Kegiatan[]
+  ajuan    Ajuan[]
+
+  kwaranKode String?
+  kwaran     Kwaran? @relation(fields: [kwaranKode], references: [kode_kwaran], onUpdate: Cascade, onDelete: Cascade)
+
+  userId String? @unique
+  user   User?   @relation("GusdepToUser", fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  createdById String?
+  createdBy   User?   @relation("CreatedGugusDepan", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+}
+
+model Anggota {
+  id_anggota     String           @id @default(uuid())
+  nta            String           @unique
+  nama_agt       String
+  tgl_lahir      DateTime
+  tahun_gabung   Int?
+  gender         Gender
+  agama          Agama
+  alamat         String
+  status_agt     StatusKeaktifan
+  jenjang_agt    JenjangAnggota?
+  gusdepKode     String
+  gugusDepan     GugusDepan       @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+  partisipan     Partisipan[]
+  RiwayatJenjang RiwayatJenjang[]
+}
+
+model Pembina {
+  id_pembina  String         @id @default(uuid())
+  nta         String         @unique
+  nama_pbn    String
+  tgl_lahir   DateTime
+  gender      Gender
+  agama       Agama
+  alamat      String
+  jenjang_pbn JenjangPembina
+  gusdepKode  String
+  gugusDepan  GugusDepan     @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Kegiatan {
+  id_kegiatan      String       @id @default(uuid())
+  nama_kegiatan    String
+  deskripsi        String
+  lokasi           String
+  tingkat_kegiatan Tingkat
+  laporan          String       @db.Text
+  tanggal          DateTime
+  gusdepKode       String?
+  gugusDepan       GugusDepan?  @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+  kwaranKode       String?
+  kwaran           Kwaran?      @relation(fields: [kwaranKode], references: [kode_kwaran], onUpdate: Cascade, onDelete: Cascade)
+  kwarcabKode      String?
+  kwarcab          Kwarcab?     @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
+  partisipan       Partisipan[]
+}
+
+model Partisipan {
+  anggotaId  String
+  anggota    Anggota  @relation(fields: [anggotaId], references: [id_anggota], onUpdate: Cascade, onDelete: Cascade)
+  kegiatanId String
+  kegiatan   Kegiatan @relation(fields: [kegiatanId], references: [id_kegiatan], onUpdate: Cascade, onDelete: Cascade)
+
+  // primary key gabungan (composite primary key, sehingga satu anggota tidak bisa memiliki peran yang sama lebih dari sekali.)
+  @@id([anggotaId, kegiatanId])
+}
+
+model RiwayatJenjang {
+  id_riwayat    String         @id @default(uuid())
+  anggotaId     String
+  anggota       Anggota        @relation(fields: [anggotaId], references: [id_anggota], onUpdate: Cascade, onDelete: Cascade)
+  jenjang_agt   JenjangAnggota
+  tgl_perubahan DateTime
+}
+
+model Ajuan {
+  id_ajuan    String     @id @default(uuid())
+  nama_ajuan  String
+  tingkat     Tingkat
+  formulir    String     @db.Text
+  status      Status?    @default(MENUNGGU)
+  nta         String?
+  gusdepKode  String
+  gugusDepan  GugusDepan @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+  kwarcabKode String
+  kwarcab     Kwarcab    @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+}
+
+enum Gender {
+  LAKI_LAKI
+  PEREMPUAN
+}
+
+enum Agama {
+  HINDU
+  KATOLIK
+  KRISTEN
+  ISLAM
+  BUDDHA
+  KONGHUCU
+}
+
+enum StatusKeaktifan {
+  AKTIF
+  NON_AKTIF
+}
+
+enum JenjangAnggota {
+  SIAGA_MULA
+  SIAGA_BANTU
+  SIAGA_TATA
+  PENGGALANG_RAMU
+  PENGGALANG_RAKIT
+  PENGGALANG_TERAP
+  PENEGAK_BANTARA
+  PENEGAK_LAKSANA
+  PANDEGA
+}
+
+enum JenjangPembina {
+  SIAGA
+  PENGGALANG
+  PENEGAK_PANDEGA
+}
+
+enum Tingkat {
+  SIAGA
+  PENGGALANG
+  PENEGAK
+  PANDEGA
+}
+
+enum Status {
+  DITERIMA
+  DITOLAK
+  MENUNGGU
+}
