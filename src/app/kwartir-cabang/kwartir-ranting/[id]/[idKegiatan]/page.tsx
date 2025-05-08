@@ -44,7 +44,8 @@ export default function DetailKegiatan() {
   useEffect(() => {
     const fetchKegiatan = async () => {
       const res = await fetch(
-        `/api/kegiatan?kode_kwaran=${id}?detail=${idKegiatan}`
+        // `/api/kegiatan?kode_kwaran=${id}?detail=${idKegiatan}`
+        `/api/kegiatan?kode_kwaran=${id}&detail=${idKegiatan}`
       );
       if (res.ok) {
         const data = await res.json();

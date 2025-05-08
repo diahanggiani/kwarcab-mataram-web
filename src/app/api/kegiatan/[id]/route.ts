@@ -412,7 +412,7 @@ export async function DELETE(
     // hapus file laporan jika ada
     if (kegiatan.laporan) {
       const oldPath = kegiatan.laporan.split("/").slice(-2).join("/");
-      await supabase.storage.from("file-bucket-nextjs").remove([oldPath]);
+      // await supabase.storage.from("file-bucket-nextjs").remove([oldPath]);
 
       const { error: deleteError } = await supabase.storage
         .from("file-bucket-nextjs")
