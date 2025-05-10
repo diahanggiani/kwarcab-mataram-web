@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
@@ -7,7 +7,7 @@ import { isValidEnum } from "@/lib/helpers/enumValidator";
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -19,12 +19,20 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve data" }, { status: 403 });
     }
 
-    const { id } = await context.params;
+    const { id } = await params;
 
     try {
+        const { searchParams } = new URL(req.url);
+
+        // pagination
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+
         const riwayat = await prisma.riwayatJenjang.findMany({
             where: { anggotaId: id },
             orderBy: { tgl_perubahan: "asc" },
+            skip: (page - 1) * limit,
+            take: limit
         });
   
         return NextResponse.json(riwayat);
@@ -34,7 +42,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
     }
 }
   
-export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -46,7 +54,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
         return NextResponse.json({ message: "Unauthorized: Only 'Gugus Depan' users can add riwayat jenjang" }, { status: 403 });
     }
 
-    const { id } = await context.params;
+    const { id } = await params;
   
     try {
         const body = await req.json();

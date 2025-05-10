@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-// filter anggota
+// filter & search anggota
 export const generateWhereClause = (
     base: Prisma.AnggotaWhereInput,
     statusFilter?: "AKTIF" | "NON_AKTIF",
@@ -11,7 +11,16 @@ export const generateWhereClause = (
     ...(searchQuery ? { nama_agt: { contains: searchQuery, mode: "insensitive" } } : {}),
 });
 
-// filter ajuan
+// search pembina
+export const generatePembinaWhereClause = (
+    base: Prisma.PembinaWhereInput,
+    searchQuery?: string
+): Prisma.PembinaWhereInput => ({
+    ...base,
+    ...(searchQuery ? { nama_pbn: { contains: searchQuery, mode: "insensitive" } } : {}),
+});
+
+// filter & search ajuan
 export const generateAjuanWhereClause = (
     base: Prisma.AjuanWhereInput,
     statusFilter?: "DITERIMA" | "DITOLAK" | "MENUNGGU",

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
@@ -8,7 +8,7 @@ import { isValidEnum } from "@/lib/helpers/enumValidator";
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
 // handler untuk tambah data pembina oleh role gusdep
-export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -20,9 +20,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
         return NextResponse.json({ message: "Unauthorized: Only 'Gugus Depan' users edit add mentor" }, { status: 403 });
     }
 
-    // id pembina dari parameter url
-    // const { id } = await context.params;
-    const { id } = await context.params;
+    const { id } = await params;
     
     try {
         const body = await req.json();
@@ -51,15 +49,16 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
             }
         }
 
-        // validasi enum
         const { gender, agama, jenjang_pbn } = body;
 
         if (gender && !isValidEnum("Gender", gender)) {
             return NextResponse.json({ message: "Invalid gender" }, { status: 400 });
         }
+
         if (agama && !isValidEnum("Agama", agama)) {
             return NextResponse.json({ message: "Invalid agama" }, { status: 400 });
         }
+        
         if (jenjang_pbn && !isValidEnum("JenjangPembina", jenjang_pbn)) {
             return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
         }
@@ -85,8 +84,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     }
 }
 
-// handler untuk hapus data pembina oleh role gusdep
-export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -99,7 +97,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     }
 
     const user = session.user as { id: string; role: string; kode_gusdep: string };
-    const { id } = await context.params;
+    const { id } = await params;
 
     try {
         // ambil data pembina berdasarkan id

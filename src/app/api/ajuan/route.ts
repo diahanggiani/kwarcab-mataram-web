@@ -12,20 +12,16 @@ import { generateAjuanWhereClause } from "@/lib/helpers/queryClause";
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-// handler untuk menambah data ajuan oleh user gusdep
 export async function POST(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-//   const session = await getSessionOrToken(req);
-//   console.log("SESSION DEBUG:", session);
+  //   const session = await getSessionOrToken(req);
+  //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "USER_GUSDEP") {
-    return NextResponse.json(
-      { message: "Unauthorized: Only 'Gugus Depan' users can submit form" },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Gugus Depan' users can submit form" }, { status: 403 });
   }
 
   try {
@@ -34,7 +30,7 @@ export async function POST(req: NextRequest) {
     const tingkat = formData.get("tingkat")?.toString().trim();
     const file = formData.get("formulir") as File;
 
-    // Query untuk mencari kode_kwarcab berdasarkan kode_gusdep
+    // query untuk mencari kode_kwarcab berdasarkan kode_gusdep
     const gusdep = await prisma.gugusDepan.findUnique({
       where: { kode_gusdep: session.user.kode_gusdep },
       include: {
@@ -46,48 +42,30 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Pastikan kode_kwarcab ditemukan
+    // memastikan kode_kwarcab ditemukan
     const kode_kwarcab = gusdep?.kwaran?.kwarcab?.kode_kwarcab;
 
     if (!kode_kwarcab) {
-      return NextResponse.json(
-        { error: "Kode kwarcab tidak ditemukan" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Kode kwarcab tidak ditemukan" }, { status: 400 });
     }
 
-    // validasi input
     if (!nama_ajuan || !tingkat || !file) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
-    // validasi enum
     if (!isValidEnum("Tingkat", tingkat)) {
-      return NextResponse.json(
-        { message: "Invalid jenjang anggota" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
     }
 
-    // validasi file
     if (file.type !== "application/pdf") {
-      return NextResponse.json(
-        { message: "Only PDF files are allowed" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Only PDF files are allowed" }, { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const maxSize = 2 * 1024 * 1024;
 
     if (buffer.length > maxSize) {
-      return NextResponse.json(
-        { message: "File size must be less than 2MB" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "File size must be less than 2MB" }, { status: 400 });
     }
 
     // upload file ke supabase storage
@@ -104,10 +82,7 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return NextResponse.json(
-        { message: "Failed to upload formulir ajuan" },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: "Failed to upload formulir ajuan" }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -116,50 +91,34 @@ export async function POST(req: NextRequest) {
 
     const url = publicUrlData?.publicUrl;
 
-    // Simpan data ajuan
     const newAjuan = await prisma.ajuan.create({
       data: {
         nama_ajuan,
         tingkat,
         formulir: url,
-        gusdepKode: session.user.kode_gusdep!, // ambil kode_gusdep dari session
-        kwarcabKode: kode_kwarcab, // pake kode_kwarcab yang ditemukan
+        gusdepKode: session.user.kode_gusdep!,
+        kwarcabKode: kode_kwarcab,
       },
     });
 
-    return NextResponse.json(
-      { message: "Ajuan successfully added", newAjuan },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Ajuan successfully added", newAjuan }, { status: 200 });
   } catch (error) {
     console.error("Error submiting form:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
 
-// handler untuk melihat data ajuan oleh user gusdep
 export async function GET(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-//   const session = await getSessionOrToken(req);
-//   console.log("SESSION DEBUG:", session);
+  //   const session = await getSessionOrToken(req);
+  //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
-  if (
-    !session ||
-    !["USER_GUSDEP", "USER_KWARCAB"].includes(session.user.role)
-  ) {
+  if (!session || !["USER_GUSDEP", "USER_KWARCAB"].includes(session.user.role)) {
     return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Gugus Depan' & 'Kwarcab' users can view data ajuan",
-      },
-      { status: 403 }
-    );
+      { message: "Unauthorized: Only 'Gugus Depan' & 'Kwarcab' users can view data ajuan"}, { status: 403 });
   }
 
   try {
@@ -167,11 +126,12 @@ export async function GET(req: NextRequest) {
     const searchQuery = searchParams.get("search") || undefined;
     const statusFilter = searchParams.get("status");
 
+    // pagination
+    const page = parseInt(searchParams.get("page") || "1");  // default page is 1
+    const limit = parseInt(searchParams.get("limit") || "10"); // default limit is 10
+
     const validStatuses: ("DITERIMA" | "DITOLAK" | "MENUNGGU" | "ALL")[] = [
-      "DITERIMA",
-      "DITOLAK",
-      "MENUNGGU",
-      "ALL",
+      "DITERIMA", "DITOLAK", "MENUNGGU", "ALL",
     ];
 
     const filterStatus: "DITERIMA" | "DITOLAK" | "MENUNGGU" | undefined =
@@ -185,6 +145,7 @@ export async function GET(req: NextRequest) {
 
     let ajuanList: Ajuan[] = [];
 
+    // user gusdep hanya lihat ajuan milik sendiri
     if (session.user.role === "USER_GUSDEP") {
       const whereClause = generateAjuanWhereClause(
         { gusdepKode: session.user.kode_gusdep },
@@ -192,12 +153,14 @@ export async function GET(req: NextRequest) {
         searchQuery
       );
 
-      // hanya lihat ajuan milik sendiri
       ajuanList = await prisma.ajuan.findMany({
-        // where: { gusdepKode: session.user.kode_gusdep },
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit, // skip berdasarkan halaman yang diminta
+        take: limit, // ambil data sesuai limit
       });
+
+    // user kwarcab lihat semua ajuan yang ditujukan untuknya (gusdep di bawah naungannya)
     } else if (session.user.role === "USER_KWARCAB") {
       const whereClause = generateAjuanWhereClause(
         { kwarcabKode: session.user.kode_kwarcab },
@@ -205,15 +168,15 @@ export async function GET(req: NextRequest) {
         searchQuery
       );
 
-      // lihat semua ajuan dalam kwarcab
       ajuanList = await prisma.ajuan.findMany({
-        // where: { kwarcabKode: session.user.kode_kwarcab },
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit
       });
     }
 
-    return NextResponse.json(ajuanList);
+    return NextResponse.json({data: ajuanList, page, limit});
   } catch (error) {
     console.error("Error viewing form:", error);
     return NextResponse.json(

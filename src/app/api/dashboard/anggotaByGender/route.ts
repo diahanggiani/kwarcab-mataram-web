@@ -10,19 +10,12 @@ import { Prisma } from "@prisma/client";
 export async function GET() {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
-  // console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve data",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve data" }, { status: 403 });
   }
 
   try {
@@ -43,12 +36,6 @@ export async function GET() {
       where: whereClause,
       select: {
         gender: true,
-        // gusdepKode: true,
-        // gugusDepan: {
-        //   select: {
-        //     kwaranKode: true
-        //   }
-        // }
         gugusDepan: {
           select: {
             nama_gusdep: true,
@@ -62,9 +49,7 @@ export async function GET() {
       },
     });
 
-    let data: Record<string, number> | Record<string, Record<string, number>> =
-      {};
-    // gender : jumlah | kwaran/gusdep -> gender -> jumlah
+    let data: Record<string, number> | Record<string, Record<string, number>> = {};
 
     if (session.user.role === "USER_GUSDEP") {
       // gender count only
@@ -79,9 +64,6 @@ export async function GET() {
           // const gd = item.gusdepKode;
           const namaGusdep = item.gugusDepan?.nama_gusdep || "Tidak diketahui";
           const gender = item.gender;
-
-          // if (!acc[gd]) acc[gd] = {};
-          // acc[gd][gender] = (acc[gd][gender] || 0) + 1;
 
           if (!acc[namaGusdep]) acc[namaGusdep] = {};
           acc[namaGusdep][gender] = (acc[namaGusdep][gender] || 0) + 1;
@@ -99,10 +81,6 @@ export async function GET() {
             item.gugusDepan?.kwaran?.nama_kwaran || "Tidak diketahui";
           const gender = item.gender;
 
-          // if (!kwaran) return acc;
-          // if (!acc[kwaran]) acc[kwaran] = {};
-          // acc[kwaran][gender] = (acc[kwaran][gender] || 0) + 1;
-
           if (!acc[namaKwaran]) acc[namaKwaran] = {};
           acc[namaKwaran][gender] = (acc[namaKwaran][gender] || 0) + 1;
 
@@ -115,9 +93,6 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching chart data:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }

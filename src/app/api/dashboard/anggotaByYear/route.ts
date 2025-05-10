@@ -10,7 +10,6 @@ import { Prisma } from '@prisma/client';
 export async function GET() {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
-  // console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
     const session = await getServerSession(authOptions);

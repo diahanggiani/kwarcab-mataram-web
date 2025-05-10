@@ -5,17 +5,15 @@ import { authOptions } from "@/lib/auth";
 import supabase from "@/lib/supabase";
 import path from "path";
 import { hash } from "bcrypt";
+import { compare } from "bcrypt";
 import { randomUUID } from "crypto";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
-import { compare } from "bcrypt";
 
-// handler untuk lihat profile user yang sedang login
 export async function GET(req: NextRequest) {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
-  // console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
@@ -43,10 +41,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!gusdep)
-        return NextResponse.json(
-          { message: "Gugus depan not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ message: "Gugus depan not found" }, { status: 404 });
       return NextResponse.json(gusdep, { status: 200 });
     }
 
@@ -64,10 +59,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!kwaran)
-        return NextResponse.json(
-          { message: "Kwaran not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ message: "Kwaran not found" }, { status: 404 });
       return NextResponse.json(kwaran, { status: 200 });
     }
 
@@ -82,21 +74,12 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!kwarcab)
-        return NextResponse.json(
-          { message: "Kwarcab not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ message: "Kwarcab not found" }, { status: 404 });
       return NextResponse.json(kwarcab, { status: 200 });
     }
 
     if (!session || session.user.role === "USER_SUPERADMIN") {
-      return NextResponse.json(
-        {
-          message:
-            "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can see profile",
-        },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can see profile" }, { status: 403 });
     }
 
     let profile;
@@ -104,58 +87,42 @@ export async function GET(req: NextRequest) {
     // cek role dan pastikan kode yang sesuai ada dalam token
     if (session.user.role === "USER_GUSDEP") {
       if (!session.user.kode_gusdep) {
-        return NextResponse.json(
-          { message: "Gugus depan code not found in token" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "Gugus depan code not found in token" }, { status: 400 });
       }
       profile = await prisma.gugusDepan.findUnique({
         where: { kode_gusdep: session.user.kode_gusdep },
       });
+
     } else if (session.user.role === "USER_KWARAN") {
       if (!session.user.kode_kwaran) {
-        return NextResponse.json(
-          { message: "Kwaran code not found in token" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "Kwaran code not found in token" }, { status: 400 });
       }
       profile = await prisma.kwaran.findUnique({
         where: { kode_kwaran: session.user.kode_kwaran },
       });
+
     } else if (session.user.role === "USER_KWARCAB") {
       if (!session.user.kode_kwarcab) {
-        return NextResponse.json(
-          { message: "Kwarcab code not found in token" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "Kwarcab code not found in token" }, { status: 400 });
       }
       profile = await prisma.kwarcab.findUnique({
         where: { kode_kwarcab: session.user.kode_kwarcab },
       });
+
     } else {
-      return NextResponse.json(
-        { message: "Role not recognized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "Role not recognized" }, { status: 403 });
     }
 
     if (!profile) {
-      return NextResponse.json(
-        { message: "Profile not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Profile not found" }, { status: 404 });
     }
     return NextResponse.json(profile, { status: 200 });
   } catch (error) {
     console.error("Error retrieving data:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
 
-// handler untuk edit profile user yang sedang login
 export async function PATCH(req: NextRequest) {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
@@ -165,13 +132,7 @@ export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can edit profile",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can edit profile" }, { status: 403 });
   }
 
   try {
@@ -195,19 +156,13 @@ export async function PATCH(req: NextRequest) {
 
       // validasi file
       if (!["image/jpeg", "image/png", "image/jpg"].includes(foto.type)) {
-        return NextResponse.json(
-          { message: "Only JPG, JPEG, or PNG files are allowed" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "Only JPG, JPEG, or PNG files are allowed" }, { status: 400 });
       }
 
       const buffer = Buffer.from(await foto.arrayBuffer());
       const maxSize = 500 * 1024;
       if (buffer.length > maxSize) {
-        return NextResponse.json(
-          { message: "File size must be less than 500KB" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "File size must be less than 500KB" }, { status: 400 });
       }
 
       // tentukan ekstensi dan path
@@ -282,6 +237,7 @@ export async function PATCH(req: NextRequest) {
         where: { kode_gusdep: session.user.kode_gusdep },
         data: updateData,
       });
+
     } else if (role === "USER_KWARAN") {
       const updateData = {
         alamat,
@@ -293,6 +249,7 @@ export async function PATCH(req: NextRequest) {
         where: { kode_kwaran: session.user.kode_kwaran },
         data: updateData,
       });
+
     } else if (role === "USER_KWARCAB") {
       const updateData = {
         alamat,
@@ -304,23 +261,15 @@ export async function PATCH(req: NextRequest) {
         where: { kode_kwarcab: session.user.kode_kwarcab },
         data: updateData,
       });
+
     } else {
-      return NextResponse.json(
-        { message: "Role not recognized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "Role not recognized" }, { status: 403 });
     }
 
-    return NextResponse.json(
-      { message: "Profile updated successfully", profile: updated },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Profile updated successfully", profile: updated }, { status: 200 });
   } catch (error) {
     console.error("Error updating data:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -334,22 +283,14 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
-    return NextResponse.json(
-      {
-        message: "Unauthorized: Session not found or user is not authenticated",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Session not found or user is not authenticated" }, { status: 403 });
   }
 
   try {
     const { currentPassword, newPassword } = await req.json();
 
     if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -362,21 +303,12 @@ export async function POST(req: NextRequest) {
 
     const passwordMatch = await compare(currentPassword, user.password);
     if (!passwordMatch) {
-      return NextResponse.json(
-        { message: "Current password is incorrect" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Current password is incorrect" }, { status: 400 });
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passwordRegex.test(newPassword)) {
-      return NextResponse.json(
-        {
-          message:
-            "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers.",
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers." }, { status: 400 });
     }
 
     const hashedPassword = await hash(newPassword, 10);
@@ -388,9 +320,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }

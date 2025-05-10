@@ -12,99 +12,62 @@ import { Prisma } from "@prisma/client";
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";w
 
-// handler tambah data kegiatan
 export async function POST(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-//   const session = await getSessionOrToken(req);
-//   console.log("SESSION DEBUG:", session);
+  //   const session = await getSessionOrToken(req);
+  //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can add activity",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can add activity" }, { status: 403 });
   }
 
   try {
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+
     const formData = await req.formData();
 
     const nama_kegiatan = formData.get("nama_kegiatan")?.toString().trim();
     const deskripsi = formData.get("deskripsi")?.toString().trim();
     const lokasi = formData.get("lokasi")?.toString().trim();
-    const tingkat_kegiatan = formData
-      .get("tingkat_kegiatan")
-      ?.toString()
-      .trim();
+    const tingkat_kegiatan = formData.get("tingkat_kegiatan")?.toString().trim();
     const tanggal = formData.get("tanggal")?.toString().trim();
     const pesertaRaw = formData.get("pesertaIds")?.toString().trim();
     const laporanFile = formData.get("laporan") as File;
 
-    // validasi input
-    if (
-      !nama_kegiatan ||
-      !deskripsi ||
-      !lokasi ||
-      !tingkat_kegiatan ||
-      !tanggal ||
-      !laporanFile ||
-      !pesertaRaw
-    ) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
+    if (!nama_kegiatan || !deskripsi || !lokasi || !tingkat_kegiatan || !tanggal || !laporanFile || !pesertaRaw) {
+      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
-    // validasi enum
     if (!isValidEnum("Tingkat", tingkat_kegiatan)) {
-      return NextResponse.json(
-        { message: "Invalid tingkat kegiatan" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Invalid tingkat kegiatan" }, { status: 400 });
     }
 
-    // atur max kata deskripsi
     if (deskripsi.split(/\s+/).length > 300) {
-      return NextResponse.json(
-        { message: "The description is too long (max 300 words)" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "The description is too long (max 300 words)" }, { status: 400 });
     }
 
-    // validasi file
     if (laporanFile.type !== "application/pdf") {
-      return NextResponse.json(
-        { message: "Only PDF files are allowed" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Only PDF files are allowed" }, { status: 400 });
     }
 
     const buffer = Buffer.from(await laporanFile.arrayBuffer());
     const maxSize = 2 * 1024 * 1024;
 
     if (buffer.length > maxSize) {
-      return NextResponse.json(
-        { message: "File size must be less than 2MB" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "File size must be less than 2MB" }, { status: 400 });
     }
 
-    // validasi input partisipan
     let pesertaIds: string[];
 
     try {
       pesertaIds = JSON.parse(pesertaRaw);
       if (!Array.isArray(pesertaIds) || pesertaIds.length === 0) {
-        return NextResponse.json(
-          { message: "At least one participant must be selected" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "At least one participant must be selected" }, { status: 400 });
       }
     } catch (error) {
       return NextResponse.json(
@@ -124,16 +87,14 @@ export async function POST(req: NextRequest) {
             id_anggota: { in: pesertaIds },
           },
           select: { id_anggota: true },
+          orderBy: { nama_agt: "asc" },
+          skip: (page - 1) * limit,
+          take: limit
         })
       ).map((a) => a.id_anggota);
-    } else if (
-      session.user.role === "USER_KWARAN" &&
-      session.user.kode_kwaran
-    ) {
-      const allowedGusdepKode = await getGusdepKodeByRegion(
-        session.user.kode_kwaran,
-        true
-      );
+
+    } else if (session.user.role === "USER_KWARAN" && session.user.kode_kwaran) {
+      const allowedGusdepKode = await getGusdepKodeByRegion(session.user.kode_kwaran, true);
       anggotaValid = (
         await prisma.anggota.findMany({
           where: {
@@ -141,16 +102,14 @@ export async function POST(req: NextRequest) {
             id_anggota: { in: pesertaIds },
           },
           select: { id_anggota: true },
+          orderBy: { nama_agt: "asc" },
+          skip: (page - 1) * limit,
+          take: limit
         })
       ).map((a) => a.id_anggota);
-    } else if (
-      session.user.role === "USER_KWARCAB" &&
-      session.user.kode_kwarcab
-    ) {
-      const allowedGusdepKode = await getGusdepKodeByRegion(
-        session.user.kode_kwarcab,
-        false
-      );
+
+    } else if (session.user.role === "USER_KWARCAB" && session.user.kode_kwarcab) {
+      const allowedGusdepKode = await getGusdepKodeByRegion(session.user.kode_kwarcab, false);
       anggotaValid = (
         await prisma.anggota.findMany({
           where: {
@@ -158,15 +117,15 @@ export async function POST(req: NextRequest) {
             id_anggota: { in: pesertaIds },
           },
           select: { id_anggota: true },
+          orderBy: { nama_agt: "asc" },
+          skip: (page - 1) * limit,
+          take: limit
         })
       ).map((a) => a.id_anggota);
     }
 
     if (anggotaValid.length !== pesertaIds.length) {
-      return NextResponse.json(
-        { message: "some participants are not valid or outside your area" },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: "some participants are not valid or outside your area" }, { status: 403 });
     }
 
     // upload laporan kegiatan (pdf) ke supabase storage bucket
@@ -183,10 +142,7 @@ export async function POST(req: NextRequest) {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      return NextResponse.json(
-        { message: "Failed to upload laporan kegiatan" },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: "Failed to upload laporan kegiatan" }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -233,51 +189,42 @@ export async function POST(req: NextRequest) {
       })),
     });
 
-    return NextResponse.json(
-      { message: "Activity data successfully added", kegiatan },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "Activity data successfully added", kegiatan }, { status: 201 });
   } catch (error) {
     console.error("Error adding activity:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 }
     );
   }
 }
 
-// handler melihat data kegiatan (all roles with access restrictions)
 export async function GET(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-//   const session = await getSessionOrToken(req);
-//   console.log("SESSION DEBUG:", session);
+  //   const session = await getSessionOrToken(req);
+  //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve activities",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve activities" }, { status: 403 });
   }
 
   try {
-    const url = req.url;
-    const searchParams = new URL(url).searchParams;
+    const { searchParams } = new URL(req.url);
     const searchQuery = searchParams.get("search") || undefined;
+        
+    // pagination
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     let kode_kwaran: string | null = null;
     let kode_gusdep: string | null = null;
     let detail: string | null = null;
 
-    if (url.includes("?")) {
-      const parts = url.split("?");
+    if (req.url.includes("?")) {
+      const parts = req.url.split("?");
 
-      // Process each part after the first question mark
+      // process each part after the first question mark
       for (let i = 1; i < parts.length; i++) {
         const paramParts = parts[i].split("=");
         if (paramParts.length === 2) {
@@ -295,10 +242,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // If no parameters were found with custom parsing, try standard URL parsing as fallback
+    // if no parameters were found with custom parsing, try standard URL parsing as fallback
     if (!kode_kwaran && !kode_gusdep && !detail) {
       try {
-        const searchParams = new URL(url).searchParams;
+        const searchParams = new URL(req.url).searchParams;
         kode_kwaran = searchParams.get("kode_kwaran");
         kode_gusdep = searchParams.get("kode_gusdep");
         detail = searchParams.get("detail");
@@ -307,7 +254,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Jika detail parameter ada, tampilkan detail kegiatan
+    // jika detail parameter ada, tampilkan detail kegiatan
     if (detail) {
       // cari kegiatan berdasarkan ID
       const kegiatan = await prisma.kegiatan.findUnique({
@@ -328,10 +275,7 @@ export async function GET(req: NextRequest) {
       });
 
       if (!kegiatan) {
-        return NextResponse.json(
-          { message: "Activity not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ message: "Activity not found" }, { status: 404 });
       }
 
       // validasi akses wilayah
@@ -343,11 +287,13 @@ export async function GET(req: NextRequest) {
       if (user.role === "USER_GUSDEP" && kode_gusdep === kegiatan.gusdepKode) {
         isAllowed = true;
         console.log("USER_GUSDEP: ", kode_gusdep, kegiatan.gusdepKode);
+
       } else if (user.role === "USER_KWARAN") {
         const gusdepList = await getGusdepKodeByRegion(kode_kwaran!, true);
         isAllowed =
           kegiatan.kwaranKode === kode_kwaran ||
           (!!kegiatan.gusdepKode && gusdepList.includes(kegiatan.gusdepKode));
+
       } else if (user.role === "USER_KWARCAB") {
         const gusdepList = await getGusdepKodeByRegion(kode_kwarcab!, false);
         isAllowed =
@@ -358,25 +304,19 @@ export async function GET(req: NextRequest) {
       }
 
       if (!isAllowed) {
-        return NextResponse.json(
-          { message: "You do not have permission to view this activity" },
-          { status: 403 }
-        );
+        return NextResponse.json({ message: "You do not have permission to view this activity" }, { status: 403 });
       }
 
       return NextResponse.json(kegiatan);
     }
 
-    // Kode yang sudah ada untuk menampilkan daftar kegiatan
+    // kode yang sudah ada untuk menampilkan daftar kegiatan
     const whereClause: Prisma.KegiatanWhereInput = {};
 
     // Validasi akses berdasarkan query
     if (kode_kwaran) {
       if (session.user.role !== "USER_KWARCAB") {
-        return NextResponse.json(
-          { message: "Forbidden: Only KWARCAB can access kode_kwaran" },
-          { status: 403 }
-        );
+        return NextResponse.json({ message: "Forbidden: Only KWARCAB can access kode_kwaran" }, { status: 403 });
       }
       whereClause.kwaranKode = kode_kwaran;
     }
@@ -384,52 +324,33 @@ export async function GET(req: NextRequest) {
     if (kode_gusdep) {
       if (session.user.role === "USER_KWARCAB") {
         if (!session.user.kode_kwarcab) {
-          return NextResponse.json(
-            { message: "Missing kode_kwarcab in session" },
-            { status: 400 }
-          );
+          return NextResponse.json({ message: "Missing kode_kwarcab in session" }, { status: 400 });
         }
-        const gusdepList = await getGusdepKodeByRegion(
-          session.user.kode_kwarcab,
-          false
-        );
+        const gusdepList = await getGusdepKodeByRegion(session.user.kode_kwarcab, false);
         if (!gusdepList.includes(kode_gusdep)) {
-          return NextResponse.json(
-            { message: "Forbidden: Gusdep not in your wilayah" },
-            { status: 403 }
-          );
+          return NextResponse.json({ message: "Forbidden: Gusdep not in your wilayah" }, { status: 403 });
         }
         whereClause.gusdepKode = kode_gusdep;
+
       } else if (session.user.role === "USER_KWARAN") {
         if (!session.user.kode_kwaran) {
-          return NextResponse.json(
-            { message: "Missing kode_kwaran in session" },
-            { status: 400 }
-          );
+          return NextResponse.json({ message: "Missing kode_kwaran in session" }, { status: 400 });
         }
-        const gusdepList = await getGusdepKodeByRegion(
-          session.user.kode_kwaran,
-          true
-        );
+        const gusdepList = await getGusdepKodeByRegion(session.user.kode_kwaran, true);
         if (!gusdepList.includes(kode_gusdep)) {
-          return NextResponse.json(
-            { message: "Forbidden: Gusdep not in your wilayah" },
-            { status: 403 }
-          );
+          return NextResponse.json({ message: "Forbidden: Gusdep not in your wilayah" }, { status: 403 });
         }
         whereClause.gusdepKode = kode_gusdep;
+
       } else if (session.user.role === "USER_GUSDEP") {
         if (kode_gusdep !== session.user.kode_gusdep) {
-          return NextResponse.json(
-            { message: "Forbidden: Can only access your own gusdep" },
-            { status: 403 }
-          );
+          return NextResponse.json({ message: "Forbidden: Can only access your own gusdep" }, { status: 403 });
         }
         whereClause.gusdepKode = kode_gusdep;
       }
     }
 
-    // Jika tidak pakai query param, tampilkan data milik sendiri
+    // jika tidak pakai query param, tampilkan data milik sendiri
     if (!kode_kwaran && !kode_gusdep) {
       if (session.user.role === "USER_GUSDEP") {
         whereClause.gusdepKode = session.user.kode_gusdep;
@@ -457,14 +378,14 @@ export async function GET(req: NextRequest) {
         tanggal: true,
         tingkat_kegiatan: true,
       },
+      orderBy: { tanggal: "desc" },
+      skip: (page - 1) * limit,
+      take: limit
     });
 
     return NextResponse.json(kegiatanList);
   } catch (error) {
     console.error("Error retrieving activity:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }

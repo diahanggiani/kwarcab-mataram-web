@@ -7,9 +7,7 @@ import { authOptions } from "@/lib/auth";
 // keperluan testing (nanti dihapus)
 import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-// handler untuk buat akun oleh superadmin
 export async function POST(req: NextRequest) {
-
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -194,7 +192,6 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// handler untuk lihat akun yang dibuat oleh superadmin
 export async function GET(req: NextRequest) {
     // untuk keperluan testing (nanti dihapus)
     const session = await getSessionOrToken(req);
@@ -208,53 +205,59 @@ export async function GET(req: NextRequest) {
     }
   
     try {
-      const users = await prisma.user.findMany({
-        where: { 
-            createdById: session.user.id,
-            role: { in: ["USER_KWARCAB", "USER_KWARAN", "USER_GUSDEP"] } },
-        select: {
-            id: true,
-            username: true,
-            role: true,
-            createdAt: true,
-            kwarcab: {
-                select: {
-                    nama_kwarcab: true,
-                    kode_kwarcab: true
-                }
-            },
-            kwaran: {
-                select: {
-                    nama_kwaran: true,
-                    kode_kwaran: true,
-                    kwarcab: {
-                        select: {
-                            kode_kwarcab: true
+        const { searchParams } = new URL(req.url);
+
+        // pagination
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+
+        const users = await prisma.user.findMany({
+            where: { 
+                createdById: session.user.id,
+                role: { in: ["USER_KWARCAB", "USER_KWARAN", "USER_GUSDEP"] } },
+            select: {
+                id: true,
+                username: true,
+                role: true,
+                createdAt: true,
+                kwarcab: {
+                    select: {
+                        nama_kwarcab: true,
+                        kode_kwarcab: true
+                    }
+                },
+                kwaran: {
+                    select: {
+                        nama_kwaran: true,
+                        kode_kwaran: true,
+                        kwarcab: {
+                            select: {
+                                kode_kwarcab: true
+                            }
                         }
                     }
-                }
-            },
-            gugusDepan: {
-                select: {
-                    nama_gusdep: true,
-                    kode_gusdep: true,
-                    kwaran: {
-                        select: {
-                            kode_kwaran: true,
-                            kwarcab: {
-                                select: {
-                                    kode_kwarcab: true
+                },
+                gugusDepan: {
+                    select: {
+                        nama_gusdep: true,
+                        kode_gusdep: true,
+                        kwaran: {
+                            select: {
+                                kode_kwaran: true,
+                                kwarcab: {
+                                    select: {
+                                        kode_kwarcab: true
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        },
-        orderBy: {
-            createdAt: "desc"
-        }
-      });
+            },
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * limit,
+            take: limit
+        });
   
         return NextResponse.json({ users });
     } catch (error) {

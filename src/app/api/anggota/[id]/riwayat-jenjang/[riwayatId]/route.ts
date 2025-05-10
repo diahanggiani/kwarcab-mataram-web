@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -6,8 +6,7 @@ import { authOptions } from "@/lib/auth";
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-// export async function DELETE(req: NextRequest, { params }: { params: { id: string; riwayatId: string } }) {
-export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string; riwayatId: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string; riwayatId: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -20,10 +19,10 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     }
 
     const user = session.user as { kode_gusdep: string };
-    const { id: anggotaId, riwayatId } = await context.params;
+    const { id: anggotaId, riwayatId } = await params;
 
   try {
-    // validasi: pastikan anggota milik gusdep yang login
+    // memastikan bahwa anggota milik user gusdep yang sedang login
     const anggota = await prisma.anggota.findUnique({
       where: { id_anggota: anggotaId },
       select: { gusdepKode: true },

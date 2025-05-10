@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Role } from '@prisma/client';
 import { getServerSession } from 'next-auth';
@@ -7,8 +7,7 @@ import { authOptions } from '@/lib/auth';
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-// handler untuk hapus akun oleh upper role
-export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
     // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
@@ -22,7 +21,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
 
     try {
         // const userIdToDelete = params.id;
-        const { id } = await context.params;
+        const { id } = await params;
 
         const targetUser = await prisma.user.findUnique({
             where: { id },

@@ -17,19 +17,12 @@ const jenjangGroups = {
 export async function GET() {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
-  // console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve data",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve data" }, { status: 403 });
   }
 
   try {
@@ -90,9 +83,6 @@ export async function GET() {
     return NextResponse.json({ ...result, total_anggota });
   } catch (error) {
     console.error("Error fetching chart data:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }

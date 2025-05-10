@@ -40,7 +40,7 @@ const data = {
       icons: icons.IdCard,
     },
     {
-      title: "Verivikasi KTA",
+      title: "Verifikasi KTA",
       url: "/kwartir-cabang/verifikasi-kta",
       icons: icons.ClipboardCheck,
     },
