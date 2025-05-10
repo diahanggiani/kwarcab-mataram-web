@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
         
             const result = pembina.map((pbn) => ({
               id_anggota: pbn.id_pembina,
-              nama_agt: pbn.nama_pbn,
+              nama_pbn: pbn.nama_pbn,
               nta: pbn.nta,
               tgl_lahir: pbn.tgl_lahir,
               gender: pbn.gender,
