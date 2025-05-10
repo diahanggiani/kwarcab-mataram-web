@@ -35,7 +35,7 @@ export default function VerifikasiKTA() {
         const res = await fetch("/api/ajuan");
         if (res.ok) {
           const data = await res.json();
-          setAjuanList(data);
+          setAjuanList(data.data);
         }
       }
     };
