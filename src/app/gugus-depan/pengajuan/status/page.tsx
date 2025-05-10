@@ -78,7 +78,7 @@ export default function StatusPengajuan() {
       if (res.ok) {
         const data = await res.json();
         console.log("Data ajuan:", data);
-        setAjuan(data);
+        setAjuan(data.data);
       } else {
         console.error("Gagal fetch data:", res.status, await res.text());
       }

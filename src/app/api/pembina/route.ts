@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
               gender: pbn.gender,
               agama: pbn.agama,
               alamat: pbn.alamat,
-              jenjang_agt: pbn.jenjang_pbn,
+              jenjang_pbn: pbn.jenjang_pbn,
               gugus_depan: pbn.gugusDepan?.nama_gusdep ?? null,
             }));
         
