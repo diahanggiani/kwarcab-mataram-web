@@ -176,7 +176,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({data: ajuanList, page, limit});
+    return NextResponse.json({ data: ajuanList, page, limit });
   } catch (error) {
     console.error("Error viewing form:", error);
     return NextResponse.json(
