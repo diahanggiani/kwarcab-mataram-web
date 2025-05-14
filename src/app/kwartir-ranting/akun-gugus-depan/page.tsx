@@ -116,7 +116,7 @@ export default function TambahAkun() {
         setPassword("");
         setNama("");
         setKode("");
-        toast.success("Akun berhasil ditambahkan");
+        toast.success("Akun berhasil ditambahkan!");
       } else if (res.status === 400) {
         const errorData = await res.json();
         switch (errorData.message) {
@@ -125,17 +125,17 @@ export default function TambahAkun() {
             break;
           case "Username cannot contain spaces":
             toast.error(
-              "Format username tidak sesuai: Username tidak boleh mengandung spasi!"
+              "Username tidak boleh mengandung spasi!"
             );
             break;
           case "Kode cannot contain spaces":
             toast.error(
-              "Format kode tidak sesuai: Kode tidak boleh mengandung spasi!"
+              "Kode tidak boleh mengandung spasi!"
             );
             break;
           case "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers.":
             toast.error(
-              "Format password tidak sesuai: Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka!"
+              "Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka!"
             );
             break;
           case "Username already exists":
@@ -145,16 +145,16 @@ export default function TambahAkun() {
             break;
           case "This code and name are already taken. Please use different values.":
             toast.error(
-              "Kode dan nama sudah digunakan. Silakan gunakan nilai yang berbeda!"
+              "Kode atau nama sudah digunakan. Silakan gunakan kode atau nama yang berbeda!"
             );
             break;
           default:
-            toast.error("Terjadi kesalahan saat menambahkan akun");
+            toast.error("Terjadi kesalahan saat menambahkan akun.");
         }
       }
     } catch (error) {
       console.error("Error adding account:", error);
-      toast.error("Terjadi kesalahan saat menambahkan akun");
+      toast.error("Terjadi kesalahan saat menambahkan akun.");
     }
   };
 
@@ -179,7 +179,7 @@ export default function TambahAkun() {
         setUsers(updateUser);
         setDeleteId(null);
         setIsDeleteOpen(false);
-        toast.success("Akun berhasil dihapus");
+        toast.success("Akun berhasil dihapus!");
       }
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -376,7 +376,7 @@ export default function TambahAkun() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus akun Anda dan menghapus data Anda dari server kami.
+              menghapus akun dan data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

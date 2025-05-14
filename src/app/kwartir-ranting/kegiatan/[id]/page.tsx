@@ -139,13 +139,13 @@ export default function DetailKegiatan() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center border-b border-gray-300">
-                  No. KTA
+                  NTA
                 </TableHead>
                 <TableHead className="text-center border-b border-gray-300">
                   Nama
                 </TableHead>
                 <TableHead className="text-center border-b border-gray-300">
-                  Tingkatan
+                  Jenjang
                 </TableHead>
               </TableRow>
             </TableHeader>

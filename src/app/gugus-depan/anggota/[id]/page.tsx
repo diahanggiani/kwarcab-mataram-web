@@ -129,7 +129,7 @@ export default function DetailAnggota() {
         setIsAddOpen(false);
         setJenjangAgt("");
         setTglPerubahan("");
-        toast.success("Riwayat berhasil ditambahkan!");
+        toast.success("Riwayat jenjang berhasil ditambahkan!");
       } else {
         console.error("Gagal menambahkan riwayat");
       }

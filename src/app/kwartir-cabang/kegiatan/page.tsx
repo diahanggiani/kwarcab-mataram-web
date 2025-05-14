@@ -104,7 +104,7 @@ export default function Kegiatan() {
       setKegiatan(updateKegiatan);
       setDeleteId(null);
       setIsDeleteOpen(false);
-      toast.success("Kegiatan berhasil dihapus");
+      toast.success("Kegiatan berhasil dihapus!");
     }
   };
 
@@ -222,7 +222,7 @@ export default function Kegiatan() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus akun Anda dan menghapus data Anda dari server kami.
+              menghapus data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

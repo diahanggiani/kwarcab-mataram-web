@@ -295,7 +295,7 @@ export default function StatusPengajuan() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus akun Anda dan menghapus data Anda dari server kami.
+              menghapus data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

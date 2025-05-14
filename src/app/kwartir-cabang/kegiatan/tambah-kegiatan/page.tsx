@@ -295,7 +295,7 @@ export default function TambahKegiatan() {
               </div>
             </div>
             <h2 className="text-xl font-bold mt-8">
-              Masukan Peserta yang Hadir
+              Pilih Peserta yang Hadir
             </h2>
             <div className="flex relative w-3/10 mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -321,7 +321,7 @@ export default function TambahKegiatan() {
                     </TableHead>
                     <TableHead className="text-center">NTA</TableHead>
                     <TableHead className="text-center">Nama</TableHead>
-                    <TableHead className="text-center">Tingkatan</TableHead>
+                    <TableHead className="text-center">Jenjang</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

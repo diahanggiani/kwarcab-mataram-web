@@ -78,10 +78,10 @@ export default function KwartirRanting() {
     <div className="w-full mx-auto p-6 bg-gray-150 rounded-lg shadow-lg">
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 uppercase">
-          DAFTAR GUGUS DEPAN {profile?.nama_kwarcab}
+          DAFTAR KWARTIR RANTING {profile?.nama_kwarcab}
         </h1>
         <h2 className="text-xl font-semibold capitalize">
-          Temukan Berbagai Gugus Depan {profile?.nama_kwarcab}
+          Temukan Berbagai Kwartir Ranting {profile?.nama_kwarcab}
         </h2>
       </div>
       <div className="space-y-8">

@@ -123,10 +123,10 @@ export default function Pembina() {
       const updatedPembina = pembina.filter(
         (item: PembinaData) => item.id_pembina !== deleteId
       );
-      toast.success("Berhasil Menghapus Data Pembina");
       setPembina(updatedPembina);
       setDeleteId(null);
       setIsDeleteOpen(false);
+      toast.success("Data pembina berhasil dihapus!");
     }
   };
 
@@ -156,15 +156,20 @@ export default function Pembina() {
         setIsEditOpen(false);
         setEditId(null);
         setEditData({});
-        toast.success("Berhasil Mengedit Data Pembina");
+        toast.success("Data pembina berhasil diperbarui!");
+      } else if (res.status === 400) {
+        const errorData = await res.json();
+        if (errorData.message === "NTA already registered") {
+          toast.error("NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.");
+        } else {
+          toast.error("Terjadi kesalahan saat memperbarui data pembina.");
+        }
+      } else {
+        toast.error("Terjadi kesalahan saat memperbarui data pembina.");
       }
     } catch (error) {
-      toast.error("Gagal Mengedit Data Pembina");
-      setIsEditOpen(false);
-      setEditId(null);
-      setEditData({});
-      setDeleteId(null);
       console.error("Gagal mengupdate pembina", error);
+      toast.error("Terjadi kesalahan saat memperbarui data pembina.");
     }
   };
 
@@ -328,7 +333,7 @@ export default function Pembina() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus akun Anda dan menghapus data Anda dari server kami.
+              menghapus data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -406,7 +411,7 @@ export default function Pembina() {
                     onChange={(e) =>
                       setEditData({ ...editData, alamat: e.target.value })
                     }
-                    placeholder="Masukkan Alamat Anggota"
+                    placeholder="Masukkan Alamat Pembina"
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
                   />
                 </div>

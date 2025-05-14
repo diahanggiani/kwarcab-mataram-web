@@ -81,7 +81,7 @@ export default function TambahPembina() {
           agama: "",
           jenjang_pbn: "",
         });
-        toast.success("Pembina Berhasil Ditambahkan")
+        toast.success("Pembina berhasil ditambahkan!")
         router.push("/gugus-depan/pembina");
       }
     } catch (error) {

@@ -81,29 +81,29 @@ export default function FormulirKTA() {
         </h2>
         <ol className="list-decimal pl-5 mt-2 space-y-1 text-base">
           <li>
-            Gugusdepan yang telah menyerahkan Data Potensi ke Kwaran dan
-            Kwarcab.
+            Gugus depan yang telah menyerahkan data potensi ke kwartir ranting dan
+            kwartir cabang.
           </li>
           <li>
             Pengajuan NTA bisa perorangan atau dikolektifkan dengan ketentuan
             yaitu:
             <ul className="list-disc pl-6 mt-1 space-y-1">
               <li>
-                Menyerahkan surat rekomendasi dari Ketua Gugusdepan secara
+                Menyerahkan surat rekomendasi dari ketua gugus depan secara
                 kolektif/perorangan bagi peserta didik.
               </li>
               <li>
-                Menyerahkan salinan Ijazah KPD/KPL bagi Pelatih Pembina Pramuka.
+                Menyerahkan salinan ijazah KPD/KPL bagi pelatih pembina pramuka.
               </li>
               <li>
                 Menyerahkan salinan surat keputusan atau surat keterangan dari
-                pihak yang berwenang pada masing-masing jajarannya bagi Pengurus
-                Kwartir/Majelis Pembimbing/Pamong Saka/Instruktur Saka.
+                pihak yang berwenang pada masing-masing jajarannya bagi pengurus
+                kwartir/majelis pembimbing/pamong saka/instruktur saka.
               </li>
               <li>
-                Mengunggah Pas Photo berlatar belakang merah dengan mengenakan
+                Mengunggah pasfoto berlatar belakang merah dengan mengenakan
                 seragam pramuka, setangan leher, dan penutup kepala sesuai
-                golongannya (Baret, Boni, Peci). Bagi anggota putri yang
+                golongannya (baret, boni, peci). Bagi anggota putri yang
                 berjilbab setangan leher harus terlihat.
               </li>
               <li>Berkas dipindai dan diunggah dalam bentuk file .pdf</li>
@@ -111,11 +111,11 @@ export default function FormulirKTA() {
           </li>
           <li>
             Hal ini dimaksudkan agar tidak terjadi penyalahgunaan Nomor Tanda
-            Anggota (NTA) Pramuka oleh pihak-pihak yang tidak bertanggung jawab.
+            Anggota (NTA) pramuka oleh pihak-pihak yang tidak bertanggung jawab.
           </li>
           <li>
             Pihak pengelola NTA dapat menolak pengajuan NTA dengan alasan
-            tertentu atau atas keputusan Kwartir Cabang.
+            tertentu atau atas keputusan kwartir cabang.
           </li>
         </ol>
 
@@ -134,7 +134,7 @@ export default function FormulirKTA() {
       <div className="w-full mx-auto p-4 bg-white rounded-lg shadow-md border border-gray-300 mt-4">
         <div className="w-full">
           <h2 className="text-xl font-bold mb-2">
-            Download Formulir Kartu Tanda Anggota
+            Download Formulir Ajuan NTA
           </h2>
           <div className="flex items-center border border-gray-500 rounded-lg px-3 py-2">
             <FileText className="text-gray-700 w-5 h-5 mr-2" />
@@ -163,7 +163,7 @@ export default function FormulirKTA() {
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>
-            <h2 className="text-xl font-bold mt-2">Tingkat</h2>
+            <h2 className="text-xl font-bold mt-2">Jenjang</h2>
             <div className="w-full mx-auto mt-2">
               <Select
                 value={ajuan.tingkat}
@@ -175,15 +175,15 @@ export default function FormulirKTA() {
                   <SelectValue placeholder="Pilih Jenjang" />
                 </SelectTrigger>
                 <SelectContent className="w-full bg-white">
-                  <SelectItem value="PENEGAK">Penegak</SelectItem>
-                  <SelectItem value="PENGGALANG">Penggalang</SelectItem>
                   <SelectItem value="SIAGA">Siaga</SelectItem>
+                  <SelectItem value="PENGGALANG">Penggalang</SelectItem>
+                  <SelectItem value="PENEGAK">Penegak</SelectItem>
                   <SelectItem value="PANDEGA">Pandega</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <h2 className="text-xl font-bold mt-2">
-              Upload Formulir Kartu Tanda Anggota
+              Upload Formulir Ajuan NTA
             </h2>
             <div className="w-full mx-auto mt-2">
               <div className="flex items-center border border-gray-500 rounded-lg px-3 py-2">

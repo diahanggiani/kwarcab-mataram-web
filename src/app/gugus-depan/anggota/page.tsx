@@ -113,6 +113,7 @@ export default function Anggota() {
 
     const fetchMembers = async () => {
       const res = await fetch(
+        // `/api/anggota?status=${filteredAjuan}?search=${debouncedSearch}`,
         `/api/anggota?status=${filteredAjuan}&search=${debouncedSearch}`,
         {
           method: "GET",
@@ -237,7 +238,7 @@ export default function Anggota() {
         toast.error("Terjadi kesalahan saat memperbarui data anggota.");
       }
     } catch (error) {
-      console.error("Gagal mengupdate pembina", error);
+      console.error("Gagal mengupdate anggota", error);
       toast.error("Terjadi kesalahan saat memperbarui data anggota.");
     }
   };
@@ -460,7 +461,7 @@ export default function Anggota() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus akun Anda dan menghapus data Anda dari server kami.
+              menghapus data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -536,7 +537,8 @@ export default function Anggota() {
                     type="text"
                     value={editData.alamat || ""}
                     onChange={(e) =>
-                      setEditData({ ...editData, tgl_lahir: e.target.value })
+                      // setEditData({ ...editData, tgl_lahir: e.target.value })
+                      setEditData({ ...editData, alamat: e.target.value })
                     }
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
                     placeholder="DD-MM-YYYY"

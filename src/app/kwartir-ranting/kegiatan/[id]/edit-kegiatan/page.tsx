@@ -285,9 +285,9 @@ export default function EditKegiatan() {
                     <SelectValue placeholder="Pilih Tingkat Kegiatan" />
                   </SelectTrigger>
                   <SelectContent className="w-full bg-white">
-                    <SelectItem value="PENEGAK">Penegak</SelectItem>
-                    <SelectItem value="PENGGALANG">Penggalang</SelectItem>
                     <SelectItem value="SIAGA">Siaga</SelectItem>
+                    <SelectItem value="PENGGALANG">Penggalang</SelectItem>
+                    <SelectItem value="PENEGAK">Penegak</SelectItem>
                     <SelectItem value="PANDEGA">Pandega</SelectItem>
                   </SelectContent>
                 </Select>
@@ -347,7 +347,7 @@ export default function EditKegiatan() {
                     </TableHead>
                     <TableHead className="text-center">NTA</TableHead>
                     <TableHead className="text-center">Nama</TableHead>
-                    <TableHead className="text-center">Tingkatan</TableHead>
+                    <TableHead className="text-center">Jenjang</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -60,7 +60,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         }
         
         if (jenjang_pbn && !isValidEnum("JenjangPembina", jenjang_pbn)) {
-            return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
+            return NextResponse.json({ message: "Invalid jenjang pembina" }, { status: 400 });
         }
 
         // update data pembina hanya jika field ada dalam request body
