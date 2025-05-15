@@ -39,7 +39,7 @@ export async function POST (req: NextRequest) {
         }
         
         if (!isValidEnum("JenjangPembina", jenjang_pbn)) {
-            return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
+            return NextResponse.json({ message: "Invalid jenjang pembina" }, { status: 400 });
         }
 
         const existingPembina = await prisma.pembina.findUnique({ where: { nta } });
@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
             });
         
             const result = pembina.map((pbn) => ({
-              id_anggota: pbn.id_pembina,
+              id_pembina: pbn.id_pembina,
               nama_pbn: pbn.nama_pbn,
               nta: pbn.nta,
               tgl_lahir: pbn.tgl_lahir,
