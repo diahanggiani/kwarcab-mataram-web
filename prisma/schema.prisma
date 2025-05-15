@@ -37,6 +37,11 @@ model User {
   createdKwarcab    Kwarcab[]    @relation("CreatedKwarcab")
   createdKwaran     Kwaran[]     @relation("CreatedKwaran")
   createdGugusDepan GugusDepan[] @relation("CreatedGugusDepan")
+
+  @@index([createdById, role])
+  @@index([role])
+  @@index([createdAt])
+  @@index([createdById])
 }
 
 model Kwarcab {
@@ -55,6 +60,9 @@ model Kwarcab {
 
   createdById String?
   createdBy   User?   @relation("CreatedKwarcab", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([nama_kwarcab])
+  @@index([alamat])
 }
 
 model Kwaran {
@@ -75,6 +83,9 @@ model Kwaran {
 
   createdById String?
   createdBy   User?   @relation("CreatedKwaran", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([kwarcabKode])
+  @@index([nama_kwaran])
 }
 
 model GugusDepan {
@@ -99,6 +110,10 @@ model GugusDepan {
 
   createdById String?
   createdBy   User?   @relation("CreatedGugusDepan", fields: [createdById], references: [id], onUpdate: Cascade, onDelete: SetNull)
+
+  @@index([kwaranKode])
+  @@index([nama_gusdep])
+  @@index([alamat])
 }
 
 model Anggota {
@@ -116,6 +131,13 @@ model Anggota {
   gugusDepan     GugusDepan       @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
   partisipan     Partisipan[]
   RiwayatJenjang RiwayatJenjang[]
+
+  @@index([nama_agt])
+  @@index([status_agt])
+  @@index([gender])
+  @@index([tahun_gabung])
+  @@index([gusdepKode])
+  @@index([gusdepKode, id_anggota]) // untuk filter kombinasi
 }
 
 model Pembina {
@@ -129,6 +151,9 @@ model Pembina {
   jenjang_pbn JenjangPembina
   gusdepKode  String
   gugusDepan  GugusDepan     @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+
+  @@index([nama_pbn])
+  @@index([gusdepKode])
 }
 
 model Kegiatan {
@@ -146,6 +171,11 @@ model Kegiatan {
   kwarcabKode      String?
   kwarcab          Kwarcab?     @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
   partisipan       Partisipan[]
+
+  @@index([tanggal])
+  @@index([gusdepKode])
+  @@index([kwaranKode])
+  @@index([kwarcabKode])
 }
 
 model Partisipan {
@@ -156,6 +186,9 @@ model Partisipan {
 
   // primary key gabungan (composite primary key, sehingga satu anggota tidak bisa memiliki peran yang sama lebih dari sekali.)
   @@id([anggotaId, kegiatanId])
+  @@index([anggotaId])
+  @@index([kegiatanId])
+  @@index([anggotaId, kegiatanId]) // untuk indexing create many di edit partisipan suatu kegiatan
 }
 
 model RiwayatJenjang {
@@ -164,6 +197,11 @@ model RiwayatJenjang {
   anggota       Anggota        @relation(fields: [anggotaId], references: [id_anggota], onUpdate: Cascade, onDelete: Cascade)
   jenjang_agt   JenjangAnggota
   tgl_perubahan DateTime
+
+  @@index([anggotaId])
+  @@index([tgl_perubahan])
+  @@index([anggotaId, tgl_perubahan]) // composite index untuk query ambil latest jenjang per anggota
+  @@index([jenjang_agt])
 }
 
 model Ajuan {
@@ -178,6 +216,11 @@ model Ajuan {
   kwarcabKode String
   kwarcab     Kwarcab    @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
   createdAt   DateTime   @default(now())
+
+  @@index([nama_ajuan])
+  @@index([status])
+  @@index([gusdepKode])
+  @@index([kwarcabKode])
 }
 
 enum Gender {

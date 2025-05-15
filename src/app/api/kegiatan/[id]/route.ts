@@ -11,10 +11,11 @@ import path from "path";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
+// import { NextRequest } from "next/server";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(new NextRequest(req));
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
@@ -83,7 +84,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(new NextRequest(req));
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
@@ -277,7 +278,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(new NextRequest(req));
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);

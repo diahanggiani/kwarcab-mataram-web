@@ -10,11 +10,11 @@ import path from "path";
 import { Prisma } from "@prisma/client";
 
 // keperluan testing (nanti dihapus)
-// import { getSessionOrToken } from "@/lib/getSessionOrToken";w
+// import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
 export async function POST(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(req);
   //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
@@ -199,7 +199,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(req);
   //   console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)

@@ -6,10 +6,11 @@ import { isValidEnum } from "@/lib/helpers/enumValidator";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
+// import { NextRequest } from "next/server";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(new NextRequest(req));
     // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
@@ -86,7 +87,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(req);
+    // const session = await getSessionOrToken(new NextRequest(req));
     // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
