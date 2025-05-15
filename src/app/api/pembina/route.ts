@@ -1,21 +1,21 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "@/lib/auth";
 import { getGusdepKodeByRegion } from "@/lib/helpers/getGusdep";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
 import { generatePembinaWhereClause } from "@/lib/helpers/queryClause";
 
 // keperluan testing (nanti dihapus)
-// import { getSessionOrToken } from "@/lib/getSessionOrToken";
+import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
 export async function POST (req: NextRequest) {
     // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(req);
+    const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== "USER_GUSDEP") {
         return NextResponse.json({ message: "Unauthorized: Only 'Gugus Depan' users can add mentor" }, { status: 403 });
@@ -68,11 +68,11 @@ export async function POST (req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(req);
+    const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
     
     if (!session || session.user.role === "USER_SUPERADMIN") {
         return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve mentors" }, { status: 403 });

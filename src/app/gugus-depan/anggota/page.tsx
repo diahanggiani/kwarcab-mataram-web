@@ -541,7 +541,7 @@ export default function Anggota() {
                       setEditData({ ...editData, alamat: e.target.value })
                     }
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
-                    placeholder="DD-MM-YYYY"
+                    placeholder="Masukan Alamat Anggota"
                   />
                 </div>
                 <h3 className="text-xl font-bold mt-2">Jenis Kelamin</h3>

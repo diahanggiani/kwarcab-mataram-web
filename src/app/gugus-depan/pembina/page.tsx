@@ -126,7 +126,7 @@ export default function Pembina() {
       setPembina(updatedPembina);
       setDeleteId(null);
       setIsDeleteOpen(false);
-      toast.success("Data pembina berhasil dihapus!");
+      toast.success("Berhasil Menghapus Data Pembina");
     }
   };
 
@@ -156,16 +156,16 @@ export default function Pembina() {
         setIsEditOpen(false);
         setEditId(null);
         setEditData({});
-        toast.success("Data pembina berhasil diperbarui!");
+        toast.success("Berhasil Mengedit Data Pembina");
       } else if (res.status === 400) {
         const errorData = await res.json();
         if (errorData.message === "NTA already registered") {
           toast.error("NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.");
         } else {
-          toast.error("Terjadi kesalahan saat memperbarui data pembina.");
+          toast.error("Terjadi kesalahan saat memperbarui data anggota.");
         }
       } else {
-        toast.error("Terjadi kesalahan saat memperbarui data pembina.");
+        toast.error("Terjadi kesalahan saat memperbarui data anggota.");
       }
     } catch (error) {
       console.error("Gagal mengupdate pembina", error);
@@ -227,9 +227,7 @@ export default function Pembina() {
               <TableRow>
                 <TableHead className="text-center font-bold">Nama</TableHead>
                 <TableHead className="text-center font-bold">NTA</TableHead>
-                <TableHead className="text-center font-bold">
-                  Tanggal Lahir
-                </TableHead>
+                <TableHead className="text-center font-bold">Tanggal Lahir</TableHead>
                 <TableHead className="text-center font-bold">Gender</TableHead>
                 <TableHead className="text-center font-bold">Agama</TableHead>
                 <TableHead className="text-center font-bold">Jenjang</TableHead>
@@ -321,10 +319,10 @@ export default function Pembina() {
         open={isDeleteOpen}
         onOpenChange={(open: boolean) => {
           if (!open) {
-            setIsDeleteOpen(false);
-            setDeleteId(null);
-          }
-        }}
+              setIsDeleteOpen(false);
+              setDeleteId(null);
+            }
+          }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -333,7 +331,7 @@ export default function Pembina() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Ini akan secara permanen
-              menghapus data Anda dari server kami.
+              menghapus akun Anda dan menghapus data Anda dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -356,6 +354,7 @@ export default function Pembina() {
           if (!open) {
             setIsEditOpen(false);
             setEditId(null);
+            setEditData({});
           }
         }}
       >
@@ -378,7 +377,9 @@ export default function Pembina() {
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
                   />
                 </div>
-                <h2 className="text-xl font-bold mt-2">Nomor Tanda Anggota</h2>
+                <h2 className="text-xl font-bold mt-2">
+                  Nomor Tanda Anggota
+                </h2>
                 <div className="w-full mx-auto mt-2">
                   <Input
                     type="text"
@@ -411,14 +412,14 @@ export default function Pembina() {
                     onChange={(e) =>
                       setEditData({ ...editData, alamat: e.target.value })
                     }
-                    placeholder="Masukkan Alamat Pembina"
+                    placeholder="Masukkan Alamat Anggota"
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
                   />
                 </div>
                 <h2 className="text-xl font-bold mt-2">Jenis Kelamin</h2>
                 <div className="w-full mx-auto mt-2">
                   <Select
-                    value={editData.gender}
+                    value={editData.gender || ""}
                     onValueChange={(value) =>
                       setEditData({
                         ...editData,
@@ -438,7 +439,7 @@ export default function Pembina() {
                 <h2 className="text-xl font-bold mt-2">Agama</h2>
                 <div className="w-full mx-auto mt-2">
                   <Select
-                    value={editData.agama}
+                    value={editData.agama || ""}
                     onValueChange={(value) =>
                       setEditData({
                         ...editData,
@@ -462,7 +463,7 @@ export default function Pembina() {
                 <h2 className="text-xl font-bold mt-2">Jenjang</h2>
                 <div className="w-full mx-auto mt-2">
                   <Select
-                    value={editData.jenjang_pbn}
+                    value={editData.jenjang_pbn || ""}
                     onValueChange={(value) =>
                       setEditData({ ...editData, jenjang_pbn: value })
                     }
@@ -473,16 +474,18 @@ export default function Pembina() {
                     <SelectContent className="w-full bg-white">
                       <SelectItem value="SIAGA">Siaga</SelectItem>
                       <SelectItem value="PENGGALANG">Penggalang</SelectItem>
-                      <SelectItem value="PENEGAK_PANDEGA">Penegak Pandega</SelectItem>
+                      <SelectItem value="PENEGAK_PANDEGA">
+                        Penegak Pandega
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </form>
             </div>
           </DialogHeader>
-          <Button
+          <Button type="submit"
             onClick={handleEditSubmit}
-            className="bg-amber-950 text-white text-base px-16 py-5 rounded-md hover:bg-gray-900 transition font-semibold mt-4"
+            className="w-full bg-amber-950 text-white text-base px-16 py-5 rounded-md hover:bg-gray-900 transition font-semibold mt-4"
           >
             Simpan Perubahan
           </Button>
