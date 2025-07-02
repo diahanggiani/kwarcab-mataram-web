@@ -234,7 +234,7 @@ export default function Pembina() {
                     </TableCell>
                     <TableCell className="text-center">
                       {pembina.gender === "LAKI_LAKI"
-                        ? "Laki-laki"
+                        ? "Laki-Laki"
                         : "Perempuan"}
                     </TableCell>
                     <TableCell className="text-center">

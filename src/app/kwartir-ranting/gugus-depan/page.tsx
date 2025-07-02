@@ -119,7 +119,7 @@ export default function GugusDepan() {
             <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mb-4">
               <CardContent className="flex items-center w-full gap-4">
                 <Avatar className="h-36 w-36">
-                  <AvatarImage src={gusdep.foto_gusdep} />
+                  <AvatarImage src={gusdep.foto_gusdep || "https://github.com/shadcn.png"} />
                   <AvatarFallback>GugusDepanProfile</AvatarFallback>
                 </Avatar>
                 <div className="ml-4">

@@ -146,6 +146,16 @@ export default function DetailGugusDepan() {
     fethKegiatan();
   }, [id, session]);
 
+  // fungsi format jenjang
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
+  };
+
   if (!mounted || !session || !profile || !anggota || !pembina || !kegiatan) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -231,13 +241,18 @@ export default function DetailGugusDepan() {
                           )}
                         </TableCell>
                         <TableCell className="text-center">
-                          {pembina.gender}
+                          {pembina.gender === "LAKI_LAKI"
+                        ? "Laki-Laki"
+                        : "Perempuan"}
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.agama}
                         </TableCell>
-                        <TableCell className="text-center">
+                        {/* <TableCell className="text-center">
                           {pembina.jenjang_pbn}
+                        </TableCell> */}
+                        <TableCell className="text-center">
+                          {formatJenjang(pembina.jenjang_pbn)}
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.alamat}
@@ -313,13 +328,18 @@ export default function DetailGugusDepan() {
                           )}
                         </TableCell>
                         <TableCell className="text-center">
-                          {anggota.gender}
+                          {anggota.gender === "LAKI_LAKI"
+                        ? "Laki-Laki"
+                        : "Perempuan"}
                         </TableCell>
                         <TableCell className="text-center">
                           {anggota.agama}
                         </TableCell>
-                        <TableCell className="text-center">
+                        {/* <TableCell className="text-center">
                           {jenjang[anggota.id_anggota] || "-"}
+                        </TableCell> */}
+                        <TableCell className="text-center">
+                          {formatJenjang(jenjang[anggota.id_anggota])}
                         </TableCell>
                         <TableCell className="text-center">
                           {anggota.alamat}

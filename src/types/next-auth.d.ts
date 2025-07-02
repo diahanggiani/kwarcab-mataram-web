@@ -4,8 +4,6 @@ extend typing bawaan NextAuth, supaya session.user dan token bisa menyimpan prop
 - nanti bisa ditambah role, kodeKwarcab, dsb.
 */
 
-// deklarasi tipe next-auth
-// import NextAuth from "next-auth"
 import { DefaultSession, DefaultUser } from "next-auth";
 import { JWT as DefaultJWT } from "next-auth/jwt";
 
@@ -22,14 +20,6 @@ declare module "next-auth" {
   // data yang akan muncul saat akses session, baik di server maupun client
   interface Session extends DefaultSession {
     user: User;
-    // user: User & {
-    //     id: string
-    //     username: string
-    // }
-    // token: {
-    //     id: string
-    //     username: string
-    // }
   }
 }
 

@@ -179,6 +179,16 @@ export default function Anggota() {
     fetchMembers();
   }, [session, debouncedSearch, filteredAjuan]);
 
+  // fungsi format jenjang
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
+  };
+
   const handleDelete = async () => {
     if (!deleteId) return;
 
@@ -365,14 +375,22 @@ export default function Anggota() {
                       {new Date(anggota.tgl_lahir).toLocaleDateString("id-ID")}
                     </TableCell>
                     <TableCell className="text-center">
-                      {anggota.gender}
+                      {anggota.gender === "LAKI_LAKI"
+                        ? "Laki-Laki"
+                        : "Perempuan"}
                     </TableCell>
                     <TableCell className="text-center">
                       {anggota.agama}
                     </TableCell>
-                    <TableCell className="text-center">
+
+                    {/* <TableCell className="text-center">
                       {jenjang[anggota.id_anggota] || "-"}
+                    </TableCell> */}
+
+                    <TableCell className="text-center">
+                      {formatJenjang(jenjang[anggota.id_anggota])}
                     </TableCell>
+
                     <TableCell className="text-center">
                       {anggota.alamat}
                     </TableCell>

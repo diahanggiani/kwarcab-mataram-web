@@ -128,6 +128,16 @@ export default function EditKegiatan() {
     fetchMembers();
   }, [id, debouncedSearch]);
 
+  // fungsi format jenjang
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -369,9 +379,12 @@ export default function EditKegiatan() {
                       <TableCell className="text-center">
                         {participant.nama_agt}
                       </TableCell>
-                      <TableCell className="text-center">
+                      {/* <TableCell className="text-center">
                         {jenjang[participant.id_anggota] || "-"}
-                      </TableCell>
+                      </TableCell> */}
+                      <TableCell className="text-center">
+                      {formatJenjang(jenjang[participant.id_anggota])}
+                    </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

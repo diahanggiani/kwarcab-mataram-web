@@ -56,6 +56,16 @@ export default function DetailKegiatan() {
     fetchKegiatan();
   }, [id, idKegiatan, setKegiatan]);
 
+  // fungsi format jenjang
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
+  };
+
   if (!mounted || !kegiatan) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -158,7 +168,7 @@ export default function DetailKegiatan() {
                     {p.anggota.nama_agt}
                   </TableCell>
                   <TableCell className="text-center border-b border-gray-300">
-                    {p.anggota.jenjang_agt}
+                    {formatJenjang(p.anggota.jenjang_agt)}
                   </TableCell>
                 </TableRow>
               ))}
