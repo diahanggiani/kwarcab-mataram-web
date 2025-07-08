@@ -84,6 +84,16 @@ export default function DetailAnggota() {
     fetchKegiatan();
   }, [session, id]);
 
+  // fungsi format jenjang
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
+  };
+
   const handleDelete = async () => {
     if (!deleteId) return;
 
@@ -174,9 +184,14 @@ export default function DetailAnggota() {
                     className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
                   >
                     <TableCell className="text-center">{index + 1}</TableCell>
-                    <TableCell className="text-center">
+                    {/* <TableCell className="text-center">
                       {item.jenjang_agt}
+                    </TableCell> */}
+
+                    <TableCell className="text-center">
+                      {formatJenjang(item.jenjang_agt)}
                     </TableCell>
+
                     <TableCell className="text-center">
                       {new Date(item.tgl_perubahan).toLocaleDateString("id-ID")}
                     </TableCell>

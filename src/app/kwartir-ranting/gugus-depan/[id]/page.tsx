@@ -362,7 +362,9 @@ function DetailGugusDepan() {
                                 : "bg-red-500 text-white"
                             }`}
                           >
-                            {anggota.status_agt}
+                            {anggota.status_agt === "AKTIF"
+                              ? "Aktif"
+                              : "Non Aktif"}
                           </Badge>
                         </div>
                       </TableCell>
