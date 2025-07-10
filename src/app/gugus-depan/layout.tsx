@@ -111,7 +111,7 @@ export default function RootLayout({
                   >
                     <Avatar className="h-16 w-16 ring-gray-100">
                       <AvatarImage
-                        src={profile?.foto_gusdep}
+                        src={profile?.foto_gusdep || "https://github.com/shadcn.png"}
                         alt="Foto Profil"
                         className="object=cover"
                       />
@@ -127,7 +127,7 @@ export default function RootLayout({
                 >
                   <DropdownMenuLabel>
                     <Avatar className="h-24 w-24 mt-4">
-                      <AvatarImage src={profile?.foto_gusdep} />
+                      <AvatarImage src={profile?.foto_gusdep || "https://github.com/shadcn.png"} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                   </DropdownMenuLabel>
