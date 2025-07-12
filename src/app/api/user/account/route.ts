@@ -17,51 +17,79 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can create account" }, { status: 403 });
+    return NextResponse.json(
+      {
+        message:
+          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can create account",
+      },
+      { status: 403 }
+    );
   }
 
   try {
     const body = await req.json();
     const { username, password } = body;
-    const nama = body.nama?.trim(), kode = body.kode?.trim();
+    const nama = body.nama?.trim(),
+      kode = body.kode?.trim();
 
     if (!username || !password || !nama || !kode) {
-      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "All fields are required" },
+        { status: 400 }
+      );
     }
 
     const usernameRegex = /^\S+$/;
     if (!usernameRegex.test(username)) {
-      return NextResponse.json({ message: "Username cannot contain spaces" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Username cannot contain spaces" },
+        { status: 400 }
+      );
     }
 
     const kodeRegex = /^\S+$/;
     if (!kodeRegex.test(kode)) {
-      return NextResponse.json({ message: "Kode cannot contain spaces" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Kode cannot contain spaces" },
+        { status: 400 }
+      );
     }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passwordRegex.test(password)) {
-      return NextResponse.json({ message: "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers." }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers.",
+        },
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({ where: { username } });
     if (existingUser) {
-      return NextResponse.json({ message: "Username already exists" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Username already exists" },
+        { status: 400 }
+      );
     }
 
     let newRole: Role;
-    
+
     // kwarcab bisa membuat user dengan role kwaran
     if (session.user.role === Role.USER_KWARCAB) {
       newRole = Role.USER_KWARAN;
 
-    // kwaran bisa membuat user dengan role gusdep
+      // kwaran bisa membuat user dengan role gusdep
     } else if (session.user.role === Role.USER_KWARAN) {
       newRole = Role.USER_GUSDEP;
 
-    // gusdep tidak bisa membuat akun untuk dirinya sendiri ataupun akun untuk gusdep lain
+      // gusdep tidak bisa membuat akun untuk dirinya sendiri ataupun akun untuk gusdep lain
     } else {
-      return NextResponse.json({ message: "You are not allowed to create users" }, { status: 403 });
+      return NextResponse.json(
+        { message: "You are not allowed to create users" },
+        { status: 403 }
+      );
     }
 
     // cek apakah kode & nama sudah dipakai dalam entitas terkait
@@ -80,63 +108,77 @@ export async function POST(req: NextRequest) {
       });
     }
     if (entityExists) {
-      return NextResponse.json({ message: "This code and name are already taken. Please use different values." }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            "This code and name are already taken. Please use different values.",
+        },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await hash(password, 10);
 
     // const newUser = await prisma.$transaction(async () => {
     //   const user = await prisma.user.create({
-    const newUser = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          username,
-          password: hashedPassword,
-          role: newRole,
-          createdBy: {
-            connect: { id: session.user.id },
+    const newUser = await prisma.$transaction(
+      async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            username,
+            password: hashedPassword,
+            role: newRole,
+            createdBy: {
+              connect: { id: session.user.id },
+            },
           },
-        },
-      });
+        });
 
-      if (newRole === Role.USER_GUSDEP) {
-        if (!session.user.kode_kwaran) {
-          throw new Error("Missing kwaran data in token");
+        if (newRole === Role.USER_GUSDEP) {
+          if (!session.user.kode_kwaran) {
+            throw new Error("Missing kwaran data in token");
+          }
+          // await prisma.gugusDepan.create({
+          await tx.gugusDepan.create({
+            data: {
+              kode_gusdep: kode,
+              nama_gusdep: nama,
+              kwaran: { connect: { kode_kwaran: session.user.kode_kwaran } }, // ambil kode kwaran dari token
+              user: { connect: { id: user.id } },
+            },
+          });
+        } else if (newRole === Role.USER_KWARAN) {
+          if (!session.user.kode_kwarcab) {
+            throw new Error("Missing kwarcab data in token");
+          }
+          // await prisma.kwaran.create({
+          await tx.kwaran.create({
+            data: {
+              kode_kwaran: kode,
+              nama_kwaran: nama,
+              kwarcab: { connect: { kode_kwarcab: session.user.kode_kwarcab } }, // ambil kode kwarcab dari token
+              user: { connect: { id: user.id } },
+            },
+          });
         }
-        // await prisma.gugusDepan.create({
-        await tx.gugusDepan.create({
-          data: {
-            kode_gusdep: kode,
-            nama_gusdep: nama,
-            kwaran: { connect: { kode_kwaran: session.user.kode_kwaran } }, // ambil kode kwaran dari token
-            user: { connect: { id: user.id } },
-          },
-        });
-      } else if (newRole === Role.USER_KWARAN) {
-        if (!session.user.kode_kwarcab) {
-          throw new Error("Missing kwarcab data in token");
-        }
-        // await prisma.kwaran.create({
-        await tx.kwaran.create({
-          data: {
-            kode_kwaran: kode,
-            nama_kwaran: nama,
-            kwarcab: { connect: { kode_kwarcab: session.user.kode_kwarcab } }, // ambil kode kwarcab dari token
-            user: { connect: { id: user.id } },
-          },
-        });
+        return user;
+      },
+      {
+        maxWait: 5000,
+        timeout: 10000,
       }
-      return user;
-    },
-    {
-      maxWait: 5000,
-      timeout: 10000
-    });
+    );
 
-    return NextResponse.json({ user: newUser, message: "User created successfully" }, { status: 201 });
+    return NextResponse.json(
+      { user: newUser, message: "User created successfully" },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error creating user:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -149,12 +191,18 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve accounts" }, { status: 403 });
+    return NextResponse.json(
+      {
+        message:
+          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can retrieve accounts",
+      },
+      { status: 403 }
+    );
   }
 
   try {
     const { searchParams } = new URL(req.url);
-    
+
     // pagination
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
@@ -184,9 +232,8 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
-        take: limit
+        take: limit,
       });
-
     } else if (session.user.role === Role.USER_KWARAN) {
       accounts = await prisma.user.findMany({
         where: {
@@ -210,11 +257,13 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
-        take: limit
+        take: limit,
       });
-
     } else {
-      return NextResponse.json({ message: "You are not allowed to view accounts" }, { status: 403 });
+      return NextResponse.json(
+        { message: "You are not allowed to view accounts" },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json({ accounts });
