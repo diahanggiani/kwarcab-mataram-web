@@ -85,8 +85,10 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await hash(password, 10);
 
-    const newUser = await prisma.$transaction(async () => {
-      const user = await prisma.user.create({
+    // const newUser = await prisma.$transaction(async () => {
+    //   const user = await prisma.user.create({
+    const newUser = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
         data: {
           username,
           password: hashedPassword,
@@ -101,7 +103,8 @@ export async function POST(req: NextRequest) {
         if (!session.user.kode_kwaran) {
           throw new Error("Missing kwaran data in token");
         }
-        await prisma.gugusDepan.create({
+        // await prisma.gugusDepan.create({
+        await tx.gugusDepan.create({
           data: {
             kode_gusdep: kode,
             nama_gusdep: nama,
@@ -113,7 +116,8 @@ export async function POST(req: NextRequest) {
         if (!session.user.kode_kwarcab) {
           throw new Error("Missing kwarcab data in token");
         }
-        await prisma.kwaran.create({
+        // await prisma.kwaran.create({
+        await tx.kwaran.create({
           data: {
             kode_kwaran: kode,
             nama_kwaran: nama,
@@ -123,6 +127,10 @@ export async function POST(req: NextRequest) {
         });
       }
       return user;
+    },
+    {
+      maxWait: 5000,
+      timeout: 10000
     });
 
     return NextResponse.json({ user: newUser, message: "User created successfully" }, { status: 201 });
