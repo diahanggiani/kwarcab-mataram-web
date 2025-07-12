@@ -52,6 +52,21 @@ export default function TambahPembina() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    const { nama_pbn, nta, tgl_lahir, alamat, gender, agama, jenjang_pbn } =
+      pembina;
+    if (
+      !nama_pbn.trim() ||
+      !nta.trim() ||
+      !tgl_lahir.trim() ||
+      !alamat.trim() ||
+      !gender.trim() ||
+      !agama.trim() ||
+      !jenjang_pbn.trim()
+    ) {
+      toast.error("Semua field harus diisi!");
+      return;
+    }
+
     try {
       const result = await fetch("/api/pembina", {
         method: "POST",
@@ -59,13 +74,13 @@ export default function TambahPembina() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nama_pbn: pembina.nama_pbn,
-          nta: pembina.nta,
-          tgl_lahir: pembina.tgl_lahir,
-          alamat: pembina.alamat,
-          gender: pembina.gender,
-          agama: pembina.agama,
-          jenjang_pbn: pembina.jenjang_pbn,
+          nama_pbn,
+          nta,
+          tgl_lahir,
+          alamat,
+          gender,
+          agama,
+          jenjang_pbn,
           gusdepKode: session?.user?.kode_gusdep,
         }),
       });
@@ -81,7 +96,7 @@ export default function TambahPembina() {
           agama: "",
           jenjang_pbn: "",
         });
-        toast.success("Pembina berhasil ditambahkan!")
+        toast.success("Pembina berhasil ditambahkan!");
         router.push("/gugus-depan/pembina");
       }
     } catch (error) {
@@ -200,7 +215,9 @@ export default function TambahPembina() {
                 <SelectContent className="w-full bg-white">
                   <SelectItem value="SIAGA">Siaga</SelectItem>
                   <SelectItem value="PENGGALANG">Penggalang</SelectItem>
-                  <SelectItem value="PENEGAK_PANDEGA">Penegak Pandega</SelectItem>
+                  <SelectItem value="PENEGAK_PANDEGA">
+                    Penegak Pandega
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

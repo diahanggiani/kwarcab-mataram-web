@@ -33,7 +33,7 @@ export default function FormulirKTA() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedFile) {
-      alert("Harap unggah formulir terlebih dahulu!");
+      toast.error("Harap unggah formulir terlebih dahulu!");
       return;
     }
 
@@ -81,8 +81,8 @@ export default function FormulirKTA() {
         </h2>
         <ol className="list-decimal pl-5 mt-2 space-y-1 text-base">
           <li>
-            Gugus depan yang telah menyerahkan data potensi ke kwartir ranting dan
-            kwartir cabang.
+            Gugus depan yang telah menyerahkan data potensi ke kwartir ranting
+            dan kwartir cabang.
           </li>
           <li>
             Pengajuan NTA bisa perorangan atau dikolektifkan dengan ketentuan

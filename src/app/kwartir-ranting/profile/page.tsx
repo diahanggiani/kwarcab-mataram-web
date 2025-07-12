@@ -82,7 +82,6 @@ export default function Profile() {
     });
 
     if (res.ok) {
-      alert("Password berhasil diubah!");
       setIsUbahOpen(false);
       setCurrentPassword("");
       setNewPassword("");
