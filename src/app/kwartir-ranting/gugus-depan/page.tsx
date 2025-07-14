@@ -68,12 +68,7 @@ export default function GugusDepan() {
     fetchProfile();
   }, [session, debouncedSearch]);
 
-  if (
-    !mounted ||
-    !session ||
-    !profile ||
-    !gugusDepan
-  ) {
+  if (!mounted || !session || !profile || !gugusDepan) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Card className="p-6 flex items-center gap-4">
@@ -115,17 +110,25 @@ export default function GugusDepan() {
           <Link
             href={`/kwartir-ranting/gugus-depan/${gusdep.kode_gusdep}`}
             key={gusdep.kode_gusdep}
+            className="block transition-transform duration-200 hover:scale-[1.02]"
+            style={{ textDecoration: "none" }}
           >
-            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mb-4">
+            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-xl hover:bg-amber-900 transition-all duration-300 mb-4">
               <CardContent className="flex items-center w-full gap-4">
                 <Avatar className="h-36 w-36">
-                  <AvatarImage src={gusdep.foto_gusdep || "https://github.com/shadcn.png"} />
+                  <AvatarImage
+                    src={gusdep.foto_gusdep || "https://github.com/shadcn.png"}
+                  />
                   <AvatarFallback>GugusDepanProfile</AvatarFallback>
                 </Avatar>
                 <div className="ml-4">
                   <h2 className="text-3xl font-bold">{gusdep.nama_gusdep}</h2>
-                  <p className="text-xl">{gusdep.alamat}</p>
-                  <p className="text-xl">{gusdep.kode_gusdep}</p>
+                  <div className="flex items-center gap-2 text-xl">
+                    <span>Alamat: {gusdep.alamat}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xl mt-1">
+                    <span>Kode Gudep: {gusdep.kode_gusdep}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>

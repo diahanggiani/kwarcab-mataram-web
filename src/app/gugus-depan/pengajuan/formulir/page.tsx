@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 
 type AjuanData = {
   nama_ajuan: string;
+  gender: string;
   tingkat: string;
   formulir: string;
 };
@@ -26,6 +27,7 @@ export default function FormulirKTA() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [ajuan, setAjuan] = useState<AjuanData>({
     nama_ajuan: "",
+    gender: "",
     tingkat: "",
     formulir: "",
   });
@@ -54,11 +56,12 @@ export default function FormulirKTA() {
         console.log("Form submitted successfully:", data);
         setAjuan({
           nama_ajuan: "",
+          gender: "",
           tingkat: "",
           formulir: "",
         });
         setSelectedFile(null);
-        toast.success("Pengajuan berhasil dikirim!");
+        toast.success("Pengajuan berhasil dikirim!", { duration: 5000 });
       } else {
         const errorData = await result.json();
         console.error("Error submitting form:", errorData);
@@ -163,6 +166,21 @@ export default function FormulirKTA() {
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>
+            <h2 className="text-xl font-bold mt-2">Jenis Kelamin</h2>
+            <div className="w-full mx-auto mt-2">
+              <Select
+                value={ajuan.gender}
+                onValueChange={(value) => setAjuan({ ...ajuan, gender: value })}
+              >
+                <SelectTrigger className="w-full border border-gray-500 rounded-lg px-3 py-2">
+                  <SelectValue placeholder="Pilih Jenis Kelamin" />
+                </SelectTrigger>
+                <SelectContent className="w-full bg-white">
+                  <SelectItem value="LAKI_LAKI">Laki-Laki</SelectItem>
+                  <SelectItem value="PEREMPUAN">Perempuan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <h2 className="text-xl font-bold mt-2">Jenjang</h2>
             <div className="w-full mx-auto mt-2">
               <Select
@@ -175,9 +193,24 @@ export default function FormulirKTA() {
                   <SelectValue placeholder="Pilih Jenjang" />
                 </SelectTrigger>
                 <SelectContent className="w-full bg-white">
-                  <SelectItem value="SIAGA">Siaga</SelectItem>
-                  <SelectItem value="PENGGALANG">Penggalang</SelectItem>
-                  <SelectItem value="PENEGAK">Penegak</SelectItem>
+                  <SelectItem value="SIAGA_MULA">Siaga Mula</SelectItem>
+                  <SelectItem value="SIAGA_BANTU">Siaga Bantu</SelectItem>
+                  <SelectItem value="SIAGA_TATA">Siaga Tata</SelectItem>
+                  <SelectItem value="PENGGALANG_RAMU">
+                    Penggalang Ramu
+                  </SelectItem>
+                  <SelectItem value="PENGGALANG_RAKIT">
+                    Penggalang Rakit
+                  </SelectItem>
+                  <SelectItem value="PENGGALANG_TERAP">
+                    Penggalang Terap
+                  </SelectItem>
+                  <SelectItem value="PENEGAK_BANTARA">
+                    Penegak Bantara
+                  </SelectItem>
+                  <SelectItem value="PENEGAK_LAKSANA">
+                    Penegak Laksana
+                  </SelectItem>
                   <SelectItem value="PANDEGA">Pandega</SelectItem>
                 </SelectContent>
               </Select>

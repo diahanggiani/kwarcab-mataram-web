@@ -1,5 +1,5 @@
 "use client";
-import { Loader2, Upload } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -132,7 +132,7 @@ export default function DetailKegiatan() {
                 download
                 className="bg-gray-700 text-white text-sm px-3 py-1 rounded-md flex items-center gap-1 cursor-pointer hover:bg-gray-900 transition"
               >
-                <Upload className="w-4 h-4" />
+                <Download className="w-4 h-4" />
                 Download File
               </Link>
               <span className="flex-grow text-gray-700 text-sm ml-3 truncate">
@@ -164,18 +164,18 @@ export default function DetailKegiatan() {
               {kegiatan?.partisipan.map((p, index) => (
                 <TableRow
                   key={p.anggotaId}
-                  className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
+                  className={
+                    index % 2 === 0
+                      ? "bg-gray-300 [&:hover]:bg-gray-300"
+                      : "bg-white"
+                  }
                 >
-                  <TableCell className="text-center border-b border-gray-300">
+                  <TableCell className="text-center border-gray-300">
                     {p.anggota.nta}
                   </TableCell>
-                  <TableCell className="text-center font-medium border-b border-gray-300">
+                  <TableCell className="text-center font-medium  border-gray-300">
                     {p.anggota.nama_agt}
                   </TableCell>
-                  {/* <TableCell className="text-center border-b border-gray-300">
-                    {p.anggota.jenjang_agt}
-                  </TableCell> */}
-                  
                   <TableCell className="text-center">
                     {formatJenjang(p.anggota.jenjang_agt)}
                   </TableCell>

@@ -111,8 +111,9 @@ export default function GugusDepan() {
           <Link
             href={`/kwartir-cabang/gugus-depan/${gusdep.kode_gusdep}`}
             key={gusdep.kode_gusdep}
+            className="block transition-transform duration-200 hover:scale-[1.02]"
           >
-            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mb-4">
+            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-xl hover:bg-amber-900 transition-all duration-300 mb-4">
               <CardContent className="flex items-center w-full gap-4">
                 <Avatar className="h-36 w-36">
                   <AvatarImage
@@ -122,8 +123,8 @@ export default function GugusDepan() {
                 </Avatar>
                 <div className="ml-4">
                   <h2 className="text-3xl font-bold">{gusdep.nama_gusdep}</h2>
-                  <p className="text-xl">{gusdep.alamat}</p>
-                  <p className="text-xl">{gusdep.kode_gusdep}</p>
+                  <p className="text-xl">Alamat: {gusdep.alamat}</p>
+                  <p className="text-xl">Kode Gudep: {gusdep.kode_gusdep}</p>
                 </div>
               </CardContent>
             </Card>

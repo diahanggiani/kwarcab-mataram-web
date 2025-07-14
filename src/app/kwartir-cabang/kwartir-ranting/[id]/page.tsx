@@ -84,22 +84,22 @@ export default function DetailGugusDepan() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">
-          <span className="font-bold text-2xl tracking-wide">
-            {profile?.kode_kwaran}
-          </span>
           <span className="font-bold text-3xl tracking-wide">
             {profile?.nama_kwaran}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.alamat || "Alamat Kwartir Ranting"}
+            Kode Kwaran : {profile?.kode_kwaran}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.kepala_kwaran || "Kepala Kwartir Ranting"}
+            Alamat: {profile?.alamat || "Alamat Kwartir Ranting"}
+          </span>
+          <span className="text-base tracking-widest">
+            Kepala Kwaran: {profile?.kepala_kwaran || "Kepala Kwartir Ranting"}
           </span>
         </div>
       </div>
 
-      <Accordion type="multiple">
+      <Accordion type="multiple" defaultValue={["kegiatan"]}>
         <AccordionItem value="kegiatan">
           <AccordionTrigger className="text-xl font-bold">
             DAFTAR KEGIATAN
@@ -122,9 +122,10 @@ export default function DetailGugusDepan() {
                     <div className="flex gap-4">
                       <Link
                         href={`/kwartir-cabang/kwartir-ranting/${id}/${kegiatan.id_kegiatan}`}
-                        className="text-white hover:text-gray-300"
+                        className="flex items-center gap-1 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                       >
                         <Eye className="h-6 w-6 cursor-pointer text-white hover:text-gray-300" />
+                        <span>Detail Kegiatan</span>
                       </Link>
                     </div>
                   </CardContent>

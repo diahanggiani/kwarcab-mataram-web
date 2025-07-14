@@ -261,17 +261,17 @@ export default function Dashboard() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">
-          <span className="font-bold text-2xl tracking-wide">
-            {profile?.kode_kwarcab}
-          </span>
           <span className="font-bold text-3xl tracking-wide">
             {profile?.nama_kwarcab}
           </span>
-          <span className="text-base tracking-widest">
-            {profile?.alamat || "Alamat Kwartir Cabang"}
+          <span className="text-base tracking-wide">
+            Kode Kwarcab: {profile?.kode_kwarcab}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.kepala_kwarcab || "Kepala Kwarcab"}
+            Alamat: {profile?.alamat || "Alamat Kwartir Cabang"}
+          </span>
+          <span className="text-base tracking-widest">
+            Kepala Kwarcab: {profile?.kepala_kwarcab || "Kepala Kwarcab"}
           </span>
         </div>
       </div>
@@ -298,13 +298,10 @@ export default function Dashboard() {
         </div>
 
         <Card className="p-6">
-          <CardTitle className="text-center text-xl font-bold mb-6">
-            Data {profile?.nama_kwarcab}
-          </CardTitle>
           <CardContent>
             <div>
               <h3 className="text-center text-lg font-bold mb-4">
-                Data Gugus Depan Setiap Kwaran
+                Jumlah Gugus Depan Setiap Kwaran
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>

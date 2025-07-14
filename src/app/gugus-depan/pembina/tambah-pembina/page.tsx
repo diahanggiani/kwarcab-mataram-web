@@ -25,6 +25,7 @@ export default function TambahPembina() {
     nama_pbn: "",
     nta: "",
     tgl_lahir: "",
+    no_telp: "",
     alamat: "",
     gender: "",
     agama: "",
@@ -52,12 +53,21 @@ export default function TambahPembina() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const { nama_pbn, nta, tgl_lahir, alamat, gender, agama, jenjang_pbn } =
-      pembina;
+    const {
+      nama_pbn,
+      nta,
+      tgl_lahir,
+      no_telp,
+      alamat,
+      gender,
+      agama,
+      jenjang_pbn,
+    } = pembina;
     if (
       !nama_pbn.trim() ||
       !nta.trim() ||
       !tgl_lahir.trim() ||
+      !no_telp.trim() ||
       !alamat.trim() ||
       !gender.trim() ||
       !agama.trim() ||
@@ -91,12 +101,13 @@ export default function TambahPembina() {
           nama_pbn: "",
           nta: "",
           tgl_lahir: "",
+          no_telp: "",
           alamat: "",
           gender: "",
           agama: "",
           jenjang_pbn: "",
         });
-        toast.success("Pembina berhasil ditambahkan!");
+        toast.success("Pembina berhasil ditambahkan!", { duration: 5000 });
         router.push("/gugus-depan/pembina");
       }
     } catch (error) {
@@ -149,6 +160,18 @@ export default function TambahPembina() {
                 }
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
                 placeholder="DD-MM-YYYY"
+              />
+            </div>
+            <h3 className="text-xl font-bold mt-2">Nomor Telepon</h3>
+            <div className="w-full mx-auto mt-2">
+              <Input
+                type="text"
+                value={pembina.no_telp}
+                onChange={(e) =>
+                  setPembina({ ...pembina, no_telp: e.target.value })
+                }
+                placeholder="Masukkan Nomor Telepon Pembina"
+                className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>
             <h3 className="text-xl font-bold mt-2">Alamat</h3>

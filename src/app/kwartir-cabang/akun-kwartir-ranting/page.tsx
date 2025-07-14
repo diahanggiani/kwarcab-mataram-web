@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Trash2, Search, PlusCircle, Loader2 } from "lucide-react";
+import { Trash2, Search, PlusCircle, Loader2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -43,6 +43,12 @@ type UserKwartirRanting = {
 
 export default function TambahAkun() {
   const { data: session } = useSession();
+  const [editUsername, setEditUsername] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+  const [editNama, setEditNama] = useState("");
+  const [editKode, setEditKode] = useState("");
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [users, setUsers] = useState<UserKwartirRanting[]>([]);
@@ -126,14 +132,10 @@ export default function TambahAkun() {
             toast.error("Semua field harus diisi!");
             break;
           case "Username cannot contain spaces":
-            toast.error(
-              "Username tidak boleh mengandung spasi!"
-            );
+            toast.error("Username tidak boleh mengandung spasi!");
             break;
           case "Kode cannot contain spaces":
-            toast.error(
-              "Kode tidak boleh mengandung spasi!"
-            );
+            toast.error("Kode tidak boleh mengandung spasi!");
             break;
           case "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers.":
             toast.error(
@@ -157,6 +159,72 @@ export default function TambahAkun() {
     } catch (error) {
       console.error("Error adding account:", error);
       alert("Terjadi kesalahan saat menambahkan akun.");
+    }
+  };
+
+  const openEditDialog = (id: string) => {
+    const userToEdit = users.find((user) => user.id === id);
+    if (!userToEdit) return;
+
+    setEditId(id);
+    setEditUsername(userToEdit.username);
+    setEditPassword(""); // Kosongkan demi keamanan
+    setEditNama(userToEdit.kwaran.nama_kwaran);
+    setEditKode(userToEdit.kwaran.kode_kwaran);
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`/api/user/account/${editId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: editUsername,
+          password: editPassword || undefined, // hanya jika diisi
+          nama: editNama,
+          kode: editKode,
+        }),
+      });
+
+      if (res.ok) {
+        const updatedUser = await res.json();
+
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === editId
+              ? {
+                  ...user,
+                  username: updatedUser.username,
+                  password: updatedUser.password,
+                  kwaran: {
+                    nama_kwaran: updatedUser.kwaran.nama_kwaran,
+                    kode_kwaran: updatedUser.kwaran.kode_kwaran,
+                  },
+                }
+              : user
+          )
+        );
+
+        toast.success("Akun berhasil diperbarui!", {
+          duration: 5000,
+        });
+        setIsEditOpen(false);
+        setEditId(null);
+        setEditUsername("");
+        setEditPassword("");
+        setEditNama("");
+        setEditKode("");
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.message || "Gagal mengedit akun.");
+      }
+    } catch (error) {
+      console.error("Error updating account:", error);
+      toast.error("Terjadi kesalahan saat mengedit akun.");
     }
   };
 
@@ -207,13 +275,9 @@ export default function TambahAkun() {
   }
 
   return (
-    <div className="p-4">
+    <div>
+      <h1 className="text-3xl font-bold mb-4">DAFTAR AKUN KWARTIR RANTING</h1>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Kelola Akun Kwartir Ranting
-          </CardTitle>
-        </CardHeader>
         <CardContent className="flex justify-between">
           <div className="flex relative w-3/10">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -285,14 +349,28 @@ export default function TambahAkun() {
                       {user.kwaran.kode_kwaran}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openDeleteDialog(user.id)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Trash2 className="h-6 w-6 text-red-600" />
-                      </Button>
+                      <div className="flex justify-center items-center gap-2">
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 flex items-center justify-center border border-amber-950 text-amber-950 hover:bg-amber-950 hover:text-white transition-colors"
+                            onClick={() => openEditDialog(user.id)}
+                          >
+                            <Pencil className="h-5 w-5" />
+                          </Button>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 flex items-center justify-center border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors"
+                            onClick={() => openDeleteDialog(user.id)}
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -362,6 +440,71 @@ export default function TambahAkun() {
                   className="bg-amber-950 text-white text-base px-4 py-2 rounded-md hover:bg-gray-900 transition font-semibold"
                 >
                   Tambah Akun
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl">
+              Edit Akun Kwartir Ranting
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <form onSubmit={handleEditSubmit}>
+              <div>
+                <h2 className="text-base font-semibold">Username</h2>
+                <Input
+                  type="text"
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold mt-2">
+                  Password (opsional)
+                </h2>
+                <Input
+                  type="password"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  className="mt-2"
+                  placeholder="Biarkan kosong jika tidak ingin mengubah password"
+                />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold mt-2">
+                  Nama Kwartir Ranting
+                </h2>
+                <Input
+                  type="text"
+                  value={editNama}
+                  onChange={(e) => setEditNama(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold mt-2">
+                  Kode Kwartir Ranting
+                </h2>
+                <Input
+                  type="text"
+                  value={editKode}
+                  onChange={(e) => setEditKode(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex justify-center mt-4">
+                <Button
+                  type="submit"
+                  className="bg-amber-950 text-white text-base px-4 py-2 rounded-md hover:bg-gray-900 transition font-semibold"
+                >
+                  Simpan Perubahan
                 </Button>
               </div>
             </form>

@@ -19,28 +19,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Loader2 } from "lucide-react";
+import { Eye, Layers, Loader2, MapPin } from "lucide-react";
 import Link from "next/link";
 
 type GugusDepanData = {
   kode_gusdep: string;
   nama_gusdep: string;
-  alamat: string;
-  npsn: string;
-  nama_sekolah: string;
-  kepala_sekolah: string;
-  foto_gusdep: string;
+  alamat: string | null;
+  npsn: string | null;
+  nama_sekolah: string | null;
+  kepala_sekolah: string | null;
+  foto_gusdep: string | null;
 };
 
 type AnggotaData = {
   id_anggota: string;
   nta: string;
   nama_agt: string;
-  tgl_lahir: string;
-  tahun_gabung: number;
+  tgl_lahir: string | null;
+  tahun_gabung: number | null;
   gender: "LAKI_LAKI" | "PEREMPUAN";
-  agama: string;
-  alamat: string;
+  agama: string | null;
+  no_telp: string | null;
+  alamat: string | null;
   status_agt: string;
   jenjang_agt: string;
 };
@@ -53,6 +54,7 @@ type PembinaData = {
   gender: "LAKI_LAKI" | "PEREMPUAN";
   agama: string;
   alamat: string;
+  no_telp: string | null;
   jenjang_pbn: string;
 };
 
@@ -156,13 +158,21 @@ export default function DetailGugusDepan() {
       .join(" ");
   };
 
-  if (!mounted || !session || !profile || !anggota || !pembina || !kegiatan) {
+  if (
+    !mounted ||
+    !session ||
+    !profile ||
+    !anggota ||
+    !pembina ||
+    !kegiatan ||
+    !jenjang
+  ) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Card className="p-6 flex items-center gap-4">
           <Loader2 className="animate-spin w-6 h-6" />
           <CardContent className="text-lg font-semibold">
-            Memuat data Detail Gugus Depan...
+            Memuat detail Gugus Depan...
           </CardContent>
         </Card>
       </div>
@@ -173,26 +183,37 @@ export default function DetailGugusDepan() {
     <div>
       <div className="flex items-center gap-12 mb-6">
         <Avatar className="h-48 w-48">
-          <AvatarImage src={profile?.foto_gusdep} />
+          <AvatarImage
+            src={profile?.foto_gusdep || "https://github.com/shadcn.png"}
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">
-          <span className="font-bold text-2xl tracking-wide">
-            {profile?.kode_gusdep}
-          </span>
           <span className="font-bold text-3xl tracking-wide">
             {profile?.nama_gusdep}
           </span>
-          <span className="text-2xl font-bold">{profile?.nama_sekolah}</span>
-          <span className="text-base tracking-widest">{profile?.alamat}</span>
-          <span className="text-base tracking-widest">
-            {profile?.kepala_sekolah}
+          <span className="text-2xl font-bold">
+            {profile?.nama_sekolah || "Nama Sekolah"}
           </span>
-          <span className="text-base tracking-widest">{profile?.npsn}</span>
+          <span className="text-base tracking-widest">
+            Kode Gudep: {profile?.kode_gusdep}
+          </span>
+          <span className="text-base tracking-widest">
+            Alamat: {profile?.alamat || "Alamat Sekolah"}
+          </span>
+          <span className="text-base tracking-widest">
+            Kepala Sekolah: {profile?.kepala_sekolah || "Kepala Sekolah"}
+          </span>
+          <span className="text-base tracking-widest">
+            NPSN: {profile?.npsn || "NPSN"}
+          </span>
         </div>
       </div>
       <div>
-        <Accordion type="multiple">
+        <Accordion
+          type="multiple"
+          defaultValue={["pembina", "anggota", "kegiatan"]}
+        >
           <AccordionItem value="pembina">
             <AccordionTrigger className="text-xl font-bold">
               PEMBINA GUGUS DEPAN
@@ -201,21 +222,24 @@ export default function DetailGugusDepan() {
               <Table className="border rounded-lg overflow-hidden">
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="text-center font-bold">NTA</TableHead>
                     <TableHead className="text-center font-bold">
                       Nama
                     </TableHead>
-                    <TableHead className="text-center font-bold">NTA</TableHead>
                     <TableHead className="text-center font-bold">
                       Tanggal Lahir
                     </TableHead>
                     <TableHead className="text-center font-bold">
-                      Gender
+                      Jenis Kelamin
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Agama
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Jenjang
+                    </TableHead>
+                    <TableHead className="text-center font-bold">
+                      Nomor Telepon
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Alamat
@@ -229,11 +253,11 @@ export default function DetailGugusDepan() {
                         key={index}
                         className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
                       >
-                        <TableCell className="text-center font-medium">
-                          {pembina.nama_pbn}
-                        </TableCell>
                         <TableCell className="text-center">
                           {pembina.nta}
+                        </TableCell>
+                        <TableCell className="text-center font-medium">
+                          {pembina.nama_pbn}
                         </TableCell>
                         <TableCell className="text-center">
                           {new Date(pembina.tgl_lahir).toLocaleDateString(
@@ -242,17 +266,17 @@ export default function DetailGugusDepan() {
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.gender === "LAKI_LAKI"
-                        ? "Laki-Laki"
-                        : "Perempuan"}
+                            ? "Laki-Laki"
+                            : "Perempuan"}
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.agama}
                         </TableCell>
-                        {/* <TableCell className="text-center">
-                          {pembina.jenjang_pbn}
-                        </TableCell> */}
                         <TableCell className="text-center">
-                          {formatJenjang(pembina.jenjang_pbn)}
+                          {pembina.jenjang_pbn}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {pembina.no_telp || "-"}
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.alamat}
@@ -282,21 +306,24 @@ export default function DetailGugusDepan() {
               <Table className="border rounded-lg overflow-hidden">
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="text-center font-bold">NTA</TableHead>
                     <TableHead className="text-center font-bold">
                       Nama
                     </TableHead>
-                    <TableHead className="text-center font-bold">NTA</TableHead>
                     <TableHead className="text-center font-bold">
                       Tanggal Lahir
                     </TableHead>
                     <TableHead className="text-center font-bold">
-                      Gender
+                      Jenis Kelamin
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Agama
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Jenjang
+                    </TableHead>
+                    <TableHead className="text-center font-bold">
+                      Nomor Telepon
                     </TableHead>
                     <TableHead className="text-center font-bold">
                       Alamat
@@ -314,38 +341,44 @@ export default function DetailGugusDepan() {
                     anggota.map((anggota, index) => (
                       <TableRow
                         key={index}
-                        className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
+                        className={
+                          index % 2 === 0
+                            ? "bg-gray-300 [&:hover]:bg-gray-300"
+                            : "bg-white"
+                        }
                       >
+                        <TableCell className="text-center">
+                          {anggota.nta}
+                        </TableCell>
                         <TableCell className="text-center font-medium">
                           {anggota.nama_agt}
                         </TableCell>
                         <TableCell className="text-center">
-                          {anggota.nta}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {new Date(anggota.tgl_lahir).toLocaleDateString(
-                            "id-ID"
-                          )}
+                          {anggota.tgl_lahir
+                            ? new Date(anggota.tgl_lahir).toLocaleDateString(
+                                "id-ID"
+                              )
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-center">
                           {anggota.gender === "LAKI_LAKI"
-                        ? "Laki-Laki"
-                        : "Perempuan"}
+                            ? "Laki-Laki"
+                            : "Perempuan"}
                         </TableCell>
                         <TableCell className="text-center">
-                          {anggota.agama}
+                          {anggota.agama || "-"}
                         </TableCell>
-                        {/* <TableCell className="text-center">
-                          {jenjang[anggota.id_anggota] || "-"}
-                        </TableCell> */}
                         <TableCell className="text-center">
                           {formatJenjang(jenjang[anggota.id_anggota])}
                         </TableCell>
                         <TableCell className="text-center">
-                          {anggota.alamat}
+                          {anggota.no_telp || "-"}
                         </TableCell>
                         <TableCell className="text-center">
-                          {anggota.tahun_gabung}
+                          {anggota.alamat || "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {anggota.tahun_gabung || "-"}
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex justify-center">
@@ -394,15 +427,22 @@ export default function DetailGugusDepan() {
                         <h2 className="text-2xl font-bold">
                           {kegiatan.nama_kegiatan}
                         </h2>
-                        <h3 className="text-lg">{kegiatan.lokasi}</h3>
-                        <h3 className="text-md">{kegiatan.tingkat_kegiatan}</h3>
+                        <div className="flex items-center gap-2 text-lg">
+                          <MapPin className="w-5 h-5 text-yellow-400" />
+                          <span>{kegiatan.lokasi}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-md">
+                          <Layers className="w-5 h-5 text-blue-300" />
+                          <span>{kegiatan.tingkat_kegiatan}</span>
+                        </div>
                       </div>
                       <div className="flex gap-4">
                         <Link
                           href={`/kwartir-cabang/gugus-depan/${id}/${kegiatan.id_kegiatan}`}
-                          className="text-white hover:text-gray-300"
+                          className="flex items-center gap-1 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                         >
                           <Eye className="h-6 w-6 cursor-pointer text-white hover:text-gray-300" />
+                          <span>Detail Kegiatan</span>
                         </Link>
                       </div>
                     </CardContent>

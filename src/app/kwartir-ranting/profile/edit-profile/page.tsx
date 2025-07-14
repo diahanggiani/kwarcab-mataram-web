@@ -96,7 +96,9 @@ export default function EditProfile() {
     <div className="flex flex-col gap-6 mb-4">
       <div className="flex items-center gap-12 mb-6">
         <Avatar className="h-64 w-64 mt-4">
-          <AvatarImage src={profile?.foto_kwaran} />
+          <AvatarImage
+            src={profile?.foto_kwaran || "https://github.com/shadcn.png"}
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">

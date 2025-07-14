@@ -16,6 +16,7 @@ import {
   LabelList,
   LineChart,
   Line,
+  Cell,
 } from "recharts";
 
 type KwartriRantingData = {
@@ -218,6 +219,20 @@ export default function Dashboard() {
     );
   }
 
+  const getColorByIndex = (index: number) => {
+    const colors = [
+      "#8884d8", // ungu
+      "#82ca9d", // hijau
+      "#ffc658", // kuning
+      "#ff8042", // oranye
+      "#8dd1e1", // biru muda
+      "#a4de6c", // hijau muda
+      "#d0ed57", // kuning lemon
+      "#fa8072", // salmon
+    ];
+    return colors[index % colors.length];
+  };
+
   return (
     <div className="p-6">
       {/* Profile Section */}
@@ -229,15 +244,17 @@ export default function Dashboard() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">
-          <span className="font-bold text-2xl tracking-wide">
-            {profile?.kode_kwaran}
-          </span>
           <span className="font-bold text-3xl tracking-wide">
             {profile?.nama_kwaran}
           </span>
-          <span className="text-base tracking-widest">{profile?.alamat || "Alamat Kwartir Ranting"}</span>
           <span className="text-base tracking-widest">
-            {profile?.kepala_kwaran || "Kepala Kwartir Ranting"}
+            Kode Kwaran : {profile?.kode_kwaran}
+          </span>
+          <span className="text-base tracking-widest">
+            Alamat: {profile?.alamat || "Alamat Kwartir Ranting"}
+          </span>
+          <span className="text-base tracking-widest">
+            Kepala Kwaran: {profile?.kepala_kwaran || "Kepala Kwartir Ranting"}
           </span>
         </div>
       </div>
@@ -264,9 +281,6 @@ export default function Dashboard() {
         </div>
 
         <Card className="p-6">
-          <CardTitle className="text-center text-xl font-bold mb-6">
-            Data {profile?.nama_kwaran}
-          </CardTitle>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -323,7 +337,13 @@ export default function Dashboard() {
                     <XAxis dataKey="jenjang" />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
-                    <Bar dataKey="total" fill="#8884d8" name="Gugus Depan">
+                    <Bar dataKey="total" name="Gugus Depan">
+                      {barChartGudep.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={getColorByIndex(index)}
+                        />
+                      ))}
                       <LabelList dataKey="total" position="top" />
                     </Bar>
                   </BarChart>

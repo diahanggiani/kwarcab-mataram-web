@@ -19,6 +19,7 @@ type AjuanData = {
   id_ajuan: string;
   tingkat: string;
   nama_ajuan: string;
+  gender: string;
   formulir: string;
   status: string | null;
   nta: string | null;
@@ -55,47 +56,45 @@ export default function VerifikasiKTA() {
     setAjuanList(updated);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSingleSubmit = async (ajuan: AjuanData) => {
     if (!session) return;
 
-    for (const ajuan of ajuanList) {
-      if (ajuan.status === "DITERIMA" && !ajuan.nta) {
-        toast.error(
-          `NTA untuk ajuan ${ajuan.nama_ajuan} belum diisi, silakan isi NTA sebelum menyimpan!`
-        );
-        return;
-      }
+    if (ajuan.status === "DITERIMA" && !ajuan.nta) {
+      toast.error(
+        `NTA untuk ajuan ${ajuan.nama_ajuan} belum diisi, silakan isi NTA sebelum menyimpan!`
+      );
+      return;
+    }
 
-      if (ajuan.status && ajuan.nta) {
-        try {
-          const res = await fetch(`/api/ajuan/${ajuan.id_ajuan}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              status: ajuan.status.toUpperCase(),
-              nta: ajuan.nta,
-            }),
-          });
+    try {
+      const res = await fetch(`/api/ajuan/${ajuan.id_ajuan}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: ajuan.status?.toUpperCase(),
+          nta: ajuan.nta,
+        }),
+      });
 
-          if (res.ok) {
-            toast.success(`Ajuan berhasil diperbarui!`);
-          } else {
-            const errorData = await res.json();
-            if (errorData.message === "NTA already registered") {
-              toast.error(
-                `NTA sudah terdaftar, silakan gunakan NTA yang berbeda!`
-              );
-            } else {
-              console.error(`Gagal dalam memperbarui ajuan`);
-            }
-          }
-        } catch (error) {
-          console.error("Error updating data:", error);
+      if (res.ok) {
+        toast.success(`Ajuan ${ajuan.nama_ajuan} berhasil diperbarui!`, {
+          duration: 5000,
+        });
+        window.location.reload();
+      } else {
+        const errorData = await res.json();
+        if (errorData.message === "NTA already registered") {
+          toast.error(`NTA sudah terdaftar, silakan gunakan NTA yang berbeda!`);
+        } else {
+          toast.error(`Gagal memperbarui ajuan.`);
+          console.error(errorData);
         }
       }
+    } catch (error) {
+      console.error("Error updating data:", error);
+      toast.error("Terjadi kesalahan saat mengupdate data.");
     }
   };
 
@@ -118,15 +117,6 @@ export default function VerifikasiKTA() {
         VERIFIKASI NOMOR TANDA ANGGOTA
       </h2>
 
-      <div className="flex items-end mb-4">
-        <Button
-          onClick={handleSubmit}
-          className="bg-amber-950 text-white hover:bg-amber-800 transition"
-        >
-          Simpan
-        </Button>
-      </div>
-
       <form className="space-y-2">
         {ajuanList.map((ajuan, index) => (
           <Card
@@ -139,8 +129,8 @@ export default function VerifikasiKTA() {
                 <div className="flex flex-col space-y-1 flex-1">
                   <span className="text-lg font-bold">{ajuan.nama_ajuan}</span>
                   <span className="text-sm">{ajuan.tingkat}</span>
+                  <span className="text-sm">{ajuan.gender}</span>
                 </div>
-
 
                 {ajuan.formulir ? (
                   <Link
@@ -159,17 +149,7 @@ export default function VerifikasiKTA() {
                   >
                     <Download className="w-6 h-6" />
                   </Button>
-                )}
-
-                {/*
-                <Link
-                  href={ajuan.formulir}
-                  download
-                  className="bg-white text-black text-sm px-3 py-1 rounded-md flex items-center gap-1 cursor-pointer hover:bg-gray-200 transition"
-                >
-                  <Download className="w-6 h-6" />
-                </Link> */}
-
+                )}
                 {/* Dropdown Status */}
                 <div className="bg-white text-black rounded-md">
                   <Select
@@ -206,8 +186,22 @@ export default function VerifikasiKTA() {
                     onChange={(e) => handleNtaChange(index, e.target.value)}
                     maxLength={20}
                     className="w-64 px-4 py-2 text-center text-black bg-white"
+                    disabled={
+                      ajuan.status === "DITERIMA" || ajuan.status === "DITOLAK"
+                    }
                   />
                 </div>
+
+                <Button
+                  type="button"
+                  onClick={() => handleSingleSubmit(ajuan)}
+                  className="bg-white text-black font-semibold hover:bg-gray-200 transition"
+                  disabled={
+                    ajuan.status === "DITERIMA" || ajuan.status === "DITOLAK"
+                  }
+                >
+                  Simpan
+                </Button>
               </div>
             </CardContent>
           </Card>

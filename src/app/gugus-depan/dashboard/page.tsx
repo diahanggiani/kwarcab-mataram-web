@@ -256,9 +256,6 @@ export default function Dashboard() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col uppercase leading-tight gap-1">
-          <span className="font-bold text-2xl tracking-wide">
-            {profile?.kode_gusdep}
-          </span>
           <span className="font-bold text-3xl tracking-wide">
             {profile?.nama_gusdep}
           </span>
@@ -266,13 +263,16 @@ export default function Dashboard() {
             {profile?.nama_sekolah || "Nama Sekolah"}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.alamat || "Alamat Sekolah"}
+            Kode Gudep: {profile?.kode_gusdep}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.kepala_sekolah || "Kepala Sekolah"}
+            Alamat: {profile?.alamat || "Alamat Sekolah"}
           </span>
           <span className="text-base tracking-widest">
-            {profile?.npsn || "NPSN"}
+            Kepala Sekolah: {profile?.kepala_sekolah || "Kepala Sekolah"}
+          </span>
+          <span className="text-base tracking-widest">
+            NPSN: {profile?.npsn || "NPSN"}
           </span>
         </div>
       </div>
@@ -299,9 +299,6 @@ export default function Dashboard() {
 
         {/* Charts */}
         <Card className="p-6">
-          <CardTitle className="text-center text-xl font-bold mb-6">
-            Data Pramuka {profile?.nama_gusdep}
-          </CardTitle>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

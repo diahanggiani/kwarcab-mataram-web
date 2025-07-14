@@ -88,9 +88,10 @@ export default function KwartirRanting() {
         {kwaran.map((kwaran) => (
           <Link
             href={`/kwartir-cabang/kwartir-ranting/${kwaran.kode_kwaran}`}
+            className="block transition-transform duration-200 hover:scale-[1.02]"
             key={kwaran.kode_kwaran}
           >
-            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mb-4">
+            <Card className="bg-amber-950 text-white p-6 rounded-lg shadow-md hover:shadow-xl hover:bg-amber-900 transition-all duration-300 mb-4">
               <CardContent className="flex items-center w-full gap-4">
                 <Avatar className="h-36 w-36">
                   <AvatarImage
@@ -100,8 +101,8 @@ export default function KwartirRanting() {
                 </Avatar>
                 <div className="ml-4">
                   <h2 className="text-3xl font-bold">{kwaran.nama_kwaran}</h2>
-                  <p className="text-xl">{kwaran.alamat}</p>
-                  <p className="text-xl">{kwaran.kode_kwaran}</p>
+                  <p className="text-xl">Alamat: {kwaran.alamat || "Alamat Kwaran"}</p>
+                  <p className="text-xl">Kode Kwaran: {kwaran.kode_kwaran}</p>
                 </div>
               </CardContent>
             </Card>

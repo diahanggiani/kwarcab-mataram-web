@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Loader2, Pencil, PlusCircle, Search, Trash2 } from "lucide-react";
+import { Eye, Layers, Loader2, MapPin, Pencil, PlusCircle, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -182,24 +182,38 @@ export default function Kegiatan() {
                   <h2 className="text-2xl font-bold">
                     {kegiatan.nama_kegiatan}
                   </h2>
-                  <h3 className="text-lg">{kegiatan.lokasi}</h3>
-                  <h3 className="text-md">{kegiatan.tingkat_kegiatan}</h3>
+                  <div className="flex items-center gap-2 text-lg">
+                    <MapPin className="w-5 h-5 text-yellow-400" />
+                    <span>{kegiatan.lokasi}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-md">
+                    <Layers className="w-5 h-5 text-blue-300" />
+                    <span>{kegiatan.tingkat_kegiatan}</span>
+                  </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-2 items-center">
                   <Link
                     href={`/kwartir-cabang/kegiatan/${kegiatan.id_kegiatan}`}
+                    className="flex items-center gap-1 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                   >
-                    <Eye className="h-6 w-6 cursor-pointer text-white hover:text-gray-300" />
+                    <Eye className="h-5 w-5 mr-1" />
+                    <span className="text-sm hidden sm:inline">Lihat</span>
                   </Link>
                   <Link
                     href={`/kwartir-cabang/kegiatan/${kegiatan.id_kegiatan}/edit-kegiatan`}
+                    className="flex items-center gap-1 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                   >
-                    <Pencil className="h-6 w-6 cursor-pointer text-white hover:text-gray-300" />
+                    <Pencil className="h-5 w-5 mr-1" />
+                    <span className="text-sm hidden sm:inline">Ubah</span>
                   </Link>
-                  <Trash2
+                  <button
+                    type="button"
                     onClick={() => openDeleteDialog(kegiatan.id_kegiatan)}
-                    className="h-6 w-6 cursor-pointer text-white hover:text-red-600"
-                  />
+                    className="flex items-center gap-1 px-3 py-2 rounded-md bg-red-600/80 hover:bg-red-700 transition text-white font-medium focus:outline-none focus:ring-2 focus:ring-red-400"
+                  >
+                    <Trash2 className="h-5 w-5 mr-1" />
+                    <span className="text-sm hidden sm:inline">Hapus</span>
+                  </button>
                 </div>
               </CardContent>
             </Card>

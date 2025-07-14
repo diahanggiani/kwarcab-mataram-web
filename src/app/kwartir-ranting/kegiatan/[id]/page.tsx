@@ -1,5 +1,5 @@
 "use client";
-import { Loader2, Upload } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -131,7 +131,7 @@ export default function DetailKegiatan() {
                 download
                 className="bg-gray-700 text-white text-sm px-3 py-1 rounded-md flex items-center gap-1 cursor-pointer hover:bg-gray-900 transition"
               >
-                <Upload className="w-4 h-4" />
+                <Download className="w-4 h-4" />
                 Download File
               </Link>
               <span className="flex-grow text-gray-700 text-sm ml-3 truncate">

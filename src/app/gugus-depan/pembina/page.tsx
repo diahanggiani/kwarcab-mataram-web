@@ -1,17 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Loader2, MoreHorizontal, PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -59,6 +51,7 @@ type PembinaData = {
   gender: "LAKI_LAKI" | "PEREMPUAN";
   agama: string;
   alamat: string;
+  no_telp: string | null;
   jenjang_pbn: string;
 };
 
@@ -103,7 +96,7 @@ export default function Pembina() {
       const updatedPembina = pembina.filter(
         (item: PembinaData) => item.id_pembina !== deleteId
       );
-      toast.success("Berhasil Menghapus Data Pembina");
+      toast.success("Berhasil Menghapus Data Pembina", { duration: 5000 });
       setPembina(updatedPembina);
       setDeleteId(null);
       setIsDeleteOpen(false);
@@ -136,10 +129,10 @@ export default function Pembina() {
         setIsEditOpen(false);
         setEditId(null);
         setEditData({});
-        toast.success("Berhasil Mengedit Data Pembina");
+        toast.success("Berhasil Mengedit Data Pembina", { duration: 5000 });
       }
     } catch (error) {
-      toast.error("Gagal Mengedit Data Pembina");
+      toast.error("Gagal Mengedit Data Pembina", { duration: 5000 });
       setIsEditOpen(false);
       setEditId(null);
       setEditData({});
@@ -176,11 +169,6 @@ export default function Pembina() {
         PEMBINA {profile?.nama_gusdep?.toUpperCase()}
       </h1>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Daftar Pembina {profile?.nama_gusdep}
-          </CardTitle>
-        </CardHeader>
         <CardContent>
           <div>
             <Link href="/gugus-depan/pembina/tambah-pembina">
@@ -200,14 +188,17 @@ export default function Pembina() {
           <Table className="border rounded-lg overflow-hidden">
             <TableHeader>
               <TableRow>
-                <TableHead className="text-center font-bold">Nama</TableHead>
                 <TableHead className="text-center font-bold">NTA</TableHead>
+                <TableHead className="text-center font-bold">Nama</TableHead>
                 <TableHead className="text-center font-bold">
                   Tanggal Lahir
                 </TableHead>
-                <TableHead className="text-center font-bold">Gender</TableHead>
+                <TableHead className="text-center font-bold">
+                  Jenis Kelamin
+                </TableHead>
                 <TableHead className="text-center font-bold">Agama</TableHead>
                 <TableHead className="text-center font-bold">Jenjang</TableHead>
+                <TableHead className="text-center font-bold">Nomor Telepon</TableHead>
                 <TableHead className="text-center font-bold">Alamat</TableHead>
                 <TableHead className="text-center font-bold">Aksi</TableHead>
               </TableRow>
@@ -223,12 +214,16 @@ export default function Pembina() {
                 pembina.map((pembina, index) => (
                   <TableRow
                     key={index}
-                    className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
+                    className={
+                      index % 2 === 0
+                        ? "bg-gray-300 [&:hover]:bg-gray-300"
+                        : "bg-white"
+                    }
                   >
+                    <TableCell className="text-center">{pembina.nta}</TableCell>
                     <TableCell className="text-center font-medium">
                       {pembina.nama_pbn}
                     </TableCell>
-                    <TableCell className="text-center">{pembina.nta}</TableCell>
                     <TableCell className="text-center">
                       {new Date(pembina.tgl_lahir).toLocaleDateString("id-ID")}
                     </TableCell>
@@ -244,45 +239,29 @@ export default function Pembina() {
                       {pembina.jenjang_pbn}
                     </TableCell>
                     <TableCell className="text-center">
+                      {pembina.no_telp || "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
                       {pembina.alamat}
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex justify-center pembinas-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                              className="hover:bg-gray-100 transition-all duration-200"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="bg-white shadow-lg rounded-lg border border-gray-200 p-2 animate-fadeIn"
-                          >
-                            <DropdownMenuLabel className="text-gray-700 font-semibold">
-                              Actions
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => openEditDialog(pembina.id_pembina)}
-                              className="hover:bg-gray-100 px-3 py-2 rounded-md transition-all duration-200"
-                            >
-                              ✏️ Ubah
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                openDeleteDialog(pembina.id_pembina)
-                              }
-                              className="hover:bg-red-100 text-red-600 px-3 py-2 rounded-md transition-all duration-200"
-                            >
-                              🗑️ Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <div className="flex justify-center items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="hover:bg-amber-200 hover:text-amber-900 border-amber-900 transition-all duration-200 focus:ring-2 focus:ring-amber-900 focus:ring-offset-2 shadow"
+                          onClick={() => openEditDialog(pembina.id_pembina)}
+                        >
+                          ✏️ Ubah
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-red-700 focus:ring-offset-2 shadow"
+                          onClick={() => openDeleteDialog(pembina.id_pembina)}
+                        >
+                          🗑️ Hapus
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -380,6 +359,18 @@ export default function Pembina() {
                       className="w-full border border-gray-500 rounded-lg px-3 py-2"
                       pattern="\d{2}-\d{2}-\d{4}"
                       placeholder="DD-MM-YYYY"
+                    />
+                  </div>
+                  <h2 className="text-xl font-bold mt-2">Nomor Telepon</h2>
+                  <div className="w-full mx-auto mt-2">
+                    <Input
+                      type="text"
+                      value={editData.no_telp || ""}
+                      onChange={(e) =>
+                        setEditData({ ...editData, no_telp: e.target.value })
+                      }
+                      placeholder="Masukkan Nomor Telepon Pembina"
+                      className="w-full border border-gray-500 rounded-lg px-3 py-2"
                     />
                   </div>
                   <h2 className="text-xl font-bold mt-2">Alamat</h2>

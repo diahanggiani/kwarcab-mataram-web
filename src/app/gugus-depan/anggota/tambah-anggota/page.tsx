@@ -26,6 +26,7 @@ export default function TambahAnggota() {
     nama_agt: "",
     nta: "",
     tgl_lahir: "",
+    no_telp: "",
     alamat: "",
     gender: "",
     agama: "",
@@ -60,6 +61,7 @@ export default function TambahAnggota() {
       !anggota.nama_agt ||
       !anggota.nta ||
       !anggota.tgl_lahir ||
+      !anggota.no_telp ||
       !anggota.alamat ||
       !anggota.gender ||
       !anggota.agama ||
@@ -82,6 +84,7 @@ export default function TambahAnggota() {
           nama_agt: anggota.nama_agt,
           nta: anggota.nta,
           tgl_lahir: anggota.tgl_lahir,
+          no_telp: anggota.no_telp,
           alamat: anggota.alamat,
           gender: anggota.gender,
           agama: anggota.agama,
@@ -99,6 +102,7 @@ export default function TambahAnggota() {
           nama_agt: "",
           nta: "",
           tgl_lahir: "",
+          no_telp: "",
           alamat: "",
           gender: "",
           agama: "",
@@ -108,16 +112,23 @@ export default function TambahAnggota() {
           tahun_gabung: "",
         });
         router.push("/gugus-depan/anggota");
-        toast.success("Anggota berhasil ditambahkan!");
+        toast.success("Anggota berhasil ditambahkan!", { duration: 5000 });
       } else if (result.status === 400) {
         const errorData = await result.json();
         if (errorData.message === "NTA already registered") {
-          toast.error("NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.");
+          toast.error(
+            "NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.",
+            { duration: 5000 }
+          );
         } else {
-          toast.error("Terjadi kesalahan saat menambah data anggota.");
+          toast.error("Terjadi kesalahan saat menambah data anggota.", {
+            duration: 5000,
+          });
         }
       } else {
-        toast.error("Terjadi kesalahan saat menambah data anggota.");
+        toast.error("Terjadi kesalahan saat menambah data anggota.", {
+          duration: 5000,
+        });
       }
     } catch (error) {
       console.error("Error adding anggota:", error);
@@ -166,6 +177,18 @@ export default function TambahAnggota() {
                 }
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
                 placeholder="DD-MM-YYYY"
+              />
+            </div>
+            <h3 className="text-xl font-bold mt-2">Nomor Telepon</h3>
+            <div className="w-full mx-auto mt-2">
+              <Input
+                type="text"
+                value={anggota.no_telp}
+                onChange={(e) =>
+                  setAnggota({ ...anggota, no_telp: e.target.value })
+                }
+                placeholder="Masukkan Nomor Telepon Anggota"
+                className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>
             <h3 className="text-xl font-bold mt-2">Alamat</h3>

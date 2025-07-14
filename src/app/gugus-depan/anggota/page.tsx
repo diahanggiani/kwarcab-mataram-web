@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  MoreHorizontal,
   Search,
   PlusCircle,
   ListFilter,
@@ -9,7 +8,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,11 +61,12 @@ type AnggotaData = {
   id_anggota: string;
   nta: string;
   nama_agt: string;
-  tgl_lahir: string;
-  tahun_gabung: number;
+  tgl_lahir: string | null;
+  tahun_gabung: number | null;
   gender: "LAKI_LAKI" | "PEREMPUAN";
-  agama: string;
-  alamat: string;
+  agama: string | null;
+  no_telp: string | null;
+  alamat: string | null;
   status_agt: string;
   jenjang_agt: string;
 };
@@ -89,7 +89,7 @@ export default function Anggota() {
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-    }, 500); // delay 500ms
+    }, 500);
     return () => clearTimeout(debounceTimer);
   }, [searchQuery]);
 
@@ -113,7 +113,6 @@ export default function Anggota() {
 
     const fetchMembers = async () => {
       const res = await fetch(
-        // `/api/anggota?status=${filteredAjuan}?search=${debouncedSearch}`,
         `/api/anggota?status=${filteredAjuan}&search=${debouncedSearch}`,
         {
           method: "GET",
@@ -179,7 +178,6 @@ export default function Anggota() {
     fetchMembers();
   }, [session, debouncedSearch, filteredAjuan]);
 
-  // fungsi format jenjang
   const formatJenjang = (jenjang_agt: string | undefined) => {
     if (!jenjang_agt) return "-";
     return jenjang_agt
@@ -206,7 +204,7 @@ export default function Anggota() {
       setAnggota(updateAnggota);
       setDeleteId(null);
       setIsDeleteOpen(false);
-      toast.success("Data anggota berhasil dihapus!");
+      toast.success("Data anggota berhasil dihapus!", { duration: 5000 });
     }
   };
 
@@ -236,20 +234,29 @@ export default function Anggota() {
         setIsEditOpen(false);
         setEditId(null);
         setEditData({});
-        toast.success("Data anggota berhasil diperbarui!");
+        toast.success("Data anggota berhasil diperbarui!", { duration: 5000 });
       } else if (res.status === 400) {
         const errorData = await res.json();
         if (errorData.message === "NTA already registered") {
-          toast.error("NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.");
+          toast.error(
+            "NTA sudah terdaftar. Silakan gunakan NTA yang berbeda.",
+            { duration: 5000 }
+          );
         } else {
-          toast.error("Terjadi kesalahan saat memperbarui data anggota.");
+          toast.error(
+            "Terjadi kesalahan saat memperbarui data anggota. , { duration: 5000 }"
+          );
         }
       } else {
-        toast.error("Terjadi kesalahan saat memperbarui data anggota.");
+        toast.error(
+          "Terjadi kesalahan saat memperbarui data anggota. , { duration: 5000 }"
+        );
       }
     } catch (error) {
       console.error("Gagal mengupdate anggota", error);
-      toast.error("Terjadi kesalahan saat memperbarui data anggota.");
+      toast.error("Terjadi kesalahan saat memperbarui data anggota.", {
+        duration: 5000,
+      });
     }
   };
 
@@ -278,14 +285,9 @@ export default function Anggota() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">
-        ANGGOTA {profile?.nama_gusdep.toUpperCase()}
+        DAFTAR ANGGOTA {profile?.nama_gusdep.toUpperCase()}
       </h1>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Daftar Anggota {profile?.nama_gusdep}
-          </CardTitle>
-        </CardHeader>
         <CardContent className="flex justify-between">
           <div className="flex relative w-3/10">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -342,16 +344,17 @@ export default function Anggota() {
           <Table className="border rounded-lg overflow-hidden">
             <TableHeader>
               <TableRow>
-                <TableHead className="text-center">Nama</TableHead>
                 <TableHead className="text-center">NTA</TableHead>
+                <TableHead className="text-center">Nama</TableHead>
                 <TableHead className="text-center">Tanggal Lahir</TableHead>
-                <TableHead className="text-center">Gender</TableHead>
+                <TableHead className="text-center">Jenis Kelamin</TableHead>
                 <TableHead className="text-center">Agama</TableHead>
                 <TableHead className="text-center">Jenjang</TableHead>
+                <TableHead className="text-center">Nomor Telepon</TableHead>
                 <TableHead className="text-center">Alamat</TableHead>
                 <TableHead className="text-center">Tahun Gabung</TableHead>
                 <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="text-center">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -365,14 +368,22 @@ export default function Anggota() {
                 anggota.map((anggota, index) => (
                   <TableRow
                     key={index}
-                    className={index % 2 === 0 ? "bg-gray-300" : "bg-white"}
+                    className={
+                      index % 2 === 0
+                        ? "bg-gray-300 [&:hover]:bg-gray-300"
+                        : "bg-white"
+                    }
                   >
+                    <TableCell className="text-center">{anggota.nta}</TableCell>
                     <TableCell className="text-center font-medium">
                       {anggota.nama_agt}
                     </TableCell>
-                    <TableCell className="text-center">{anggota.nta}</TableCell>
                     <TableCell className="text-center">
-                      {new Date(anggota.tgl_lahir).toLocaleDateString("id-ID")}
+                      {anggota.tgl_lahir
+                        ? new Date(anggota.tgl_lahir).toLocaleDateString(
+                            "id-ID"
+                          )
+                        : "-"}
                     </TableCell>
                     <TableCell className="text-center">
                       {anggota.gender === "LAKI_LAKI"
@@ -380,22 +391,19 @@ export default function Anggota() {
                         : "Perempuan"}
                     </TableCell>
                     <TableCell className="text-center">
-                      {anggota.agama}
+                      {anggota.agama || "-"}
                     </TableCell>
-
-                    {/* <TableCell className="text-center">
-                      {jenjang[anggota.id_anggota] || "-"}
-                    </TableCell> */}
-
                     <TableCell className="text-center">
                       {formatJenjang(jenjang[anggota.id_anggota])}
                     </TableCell>
-
                     <TableCell className="text-center">
-                      {anggota.alamat}
+                      {anggota.no_telp || "-"}
                     </TableCell>
                     <TableCell className="text-center">
-                      {anggota.tahun_gabung}
+                      {anggota.alamat || "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {anggota.tahun_gabung || "-"}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center">
@@ -413,49 +421,34 @@ export default function Anggota() {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex justify-center items-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                              className="hover:bg-gray-100 transition-all duration-200"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="bg-white shadow-lg rounded-lg border border-gray-200 p-2 animate-fadeIn"
+                      <div className="flex flex-col justify-center items-center gap-1">
+                        <Link
+                          href={`/gugus-depan/anggota/${anggota.id_anggota}`}
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="px-2 py-1 text-xs w-24 transition-colors duration-200 border border-gray-400 hover:bg-amber-950 hover:text-white hover:border-amber-950"
                           >
-                            <DropdownMenuLabel className="text-gray-700 font-semibold">
-                              Actions
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="hover:bg-gray-100 px-3 py-2 rounded-md transition-all duration-200">
-                              <Link
-                                href={`/gugus-depan/anggota/${anggota.id_anggota}`}
-                              >
-                                📁 Riwayat
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openEditDialog(anggota.id_anggota)}
-                              className="hover:bg-gray-100 px-3 py-2 rounded-md transition-all duration-200"
-                            >
-                              ✏️ Ubah
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                openDeleteDialog(anggota.id_anggota)
-                              }
-                              className="hover:bg-red-100 text-red-600 px-3 py-2 rounded-md transition-all duration-200"
-                            >
-                              🗑️ Hapus
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            📁 Riwayat
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="px-2 py-1 text-xs w-24 rounded-md border border-gray-400 font-semibold shadow transition-colors duration-200 hover:bg-amber-950 hover:text-white hover:border-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-900"
+                          onClick={() => openEditDialog(anggota.id_anggota)}
+                        >
+                          ✏️ Ubah
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="px-2 py-1 text-xs w-24 bg-red-600 text-white rounded-md font-semibold shadow hover:bg-red-700 transition-colors duration-200 border-none focus:outline-none focus:ring-2 focus:ring-red-400"
+                          onClick={() => openDeleteDialog(anggota.id_anggota)}
+                        >
+                          🗑️ Hapus
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -543,12 +536,24 @@ export default function Anggota() {
                 <div className="w-full mx-auto mt-2">
                   <Input
                     type="date"
-                    value={editData.tgl_lahir}
+                    value={editData.tgl_lahir || ""}
                     onChange={(e) =>
                       setEditData({ ...editData, tgl_lahir: e.target.value })
                     }
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
                     placeholder="DD-MM-YYYY"
+                  />
+                </div>
+                <h3 className="text-xl font-bold mt-2">Nomor Telepon</h3>
+                <div className="w-full mx-auto mt-2">
+                  <Input
+                    type="text"
+                    value={editData.no_telp || ""}
+                    onChange={(e) =>
+                      setEditData({ ...editData, no_telp: e.target.value })
+                    }
+                    className="w-full border border-gray-500 rounded-lg px-3 py-2"
+                    placeholder="Masukan Nomor Telepon Anggota"
                   />
                 </div>
                 <h3 className="text-xl font-bold mt-2">Alamat</h3>
@@ -557,7 +562,6 @@ export default function Anggota() {
                     type="text"
                     value={editData.alamat || ""}
                     onChange={(e) =>
-                      // setEditData({ ...editData, tgl_lahir: e.target.value })
                       setEditData({ ...editData, alamat: e.target.value })
                     }
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
