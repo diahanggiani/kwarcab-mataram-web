@@ -149,9 +149,9 @@ export default function DetailGugusDepan() {
   }, [id, session]);
 
   // fungsi format jenjang
-  const formatJenjang = (jenjang_agt: string | undefined) => {
-    if (!jenjang_agt) return "-";
-    return jenjang_agt
+  const formatJenjang = (jenjang: string | undefined) => {
+    if (!jenjang) return "-";
+    return jenjang
       .toLowerCase()
       .split("_")
       .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
@@ -273,7 +273,7 @@ export default function DetailGugusDepan() {
                           {pembina.agama}
                         </TableCell>
                         <TableCell className="text-center">
-                          {pembina.jenjang_pbn}
+                          {formatJenjang(pembina.jenjang_pbn)}
                         </TableCell>
                         <TableCell className="text-center">
                           {pembina.no_telp || "-"}

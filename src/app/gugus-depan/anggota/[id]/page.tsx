@@ -96,9 +96,15 @@ export default function DetailAnggota() {
   };
 
   const openEditDialog = (id: string) => {
-    setEditId(id);
-    setIsEditOpen(true);
+    const data = jenjang.find((item) => item.id_riwayat === id);
+    if (data) {
+      setEditId(id);
+      setJenjangAgt(data.jenjang_agt);
+      setTglPerubahan(data.tgl_perubahan); 
+      setIsEditOpen(true);
+    }
   };
+
 
   const handleEditSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -114,9 +120,16 @@ export default function DetailAnggota() {
 
       if (res.ok) {
         const updated = await res.json();
+        const updatedItem: Jenjang = {
+          id_riwayat: updated.id_riwayat ?? editId,
+          jenjang_agt: updated.jenjang_agt ?? jenjang_agt,
+          tgl_perubahan: updated.tgl_perubahan ?? tgl_perubahan,
+        };
+
         const updatedJenjang = jenjang.map((item) =>
-          item.id_riwayat === editId ? updated : item
+          item.id_riwayat === editId ? updatedItem : item
         );
+
         setJenjang(updatedJenjang);
         setIsEditOpen(false);
         setEditId(null);
@@ -130,6 +143,7 @@ export default function DetailAnggota() {
       console.error("Edit error:", error);
     }
   };
+
 
   const handleDelete = async () => {
     if (!deleteId) return;

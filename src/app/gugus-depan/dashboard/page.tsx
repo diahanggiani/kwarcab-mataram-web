@@ -225,14 +225,13 @@ export default function Dashboard() {
       ]
     : [];
 
-  if (
-    !mounted ||
-    !session ||
-    !profile ||
-    !anggotaStats ||
-    gender.length === 0 ||
-    totalKegiatan.length === 0
-  ) {
+  const isLevelDataEmpty =
+    levelData.length > 0 &&
+    levelData.every(
+      (item) => (item.male || 0) === 0 && (item.female || 0) === 0
+    );
+
+  if (!mounted || !session) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Card className="p-6 flex items-center gap-4">
@@ -292,7 +291,9 @@ export default function Dashboard() {
               <CardContent className={`text-5xl font-bold ${color}`}>
                 {value}
               </CardContent>
-              <p className="text-sm font-semibold">{profile?.nama_sekolah}</p>
+              <p className="text-sm font-semibold">
+                {profile?.nama_sekolah || "Nama Sekolah"}
+              </p>
             </Card>
           ))}
         </div>
@@ -305,60 +306,84 @@ export default function Dashboard() {
                 <h3 className="text-center text-lg font-bold mb-4">
                   Data Anggota Pramuka Berdasarkan Gender
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={genderData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {genderData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                {genderData.length === 0 ? (
+                  <div className="flex justify-center items-center h-[300px]">
+                    <span className="text-gray-500">
+                      Data Gender Belum Tersedia.
+                    </span>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={genderData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {genderData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </div>
               <div>
                 <h3 className="text-center text-lg font-bold mb-4">
                   Data Anggota Pramuka Berdasarkan Jenjang
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={levelData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="male" fill="#3366CC" name="Laki-laki" />
-                    <Bar dataKey="female" fill="#FF9900" name="Perempuan" />
-                  </BarChart>
-                </ResponsiveContainer>
+                {isLevelDataEmpty ? (
+                  <div className="flex justify-center items-center h-[300px]">
+                    <span className="text-gray-500">
+                      Data Jenjang Belum Tersedia.
+                    </span>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={levelData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="male" fill="#3366CC" name="Laki-laki" />
+                      <Bar dataKey="female" fill="#FF9900" name="Perempuan" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
 
             <div className="mt-6">
               <h3 className="text-center text-lg font-bold mb-4">
-                Data Anggota Pramuka Setiap Tahun
+                Data Anggota Pramuka {profile?.nama_gusdep} Setiap Tahun
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={historyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="members"
-                    stroke="#FF4081"
-                    dot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {historyData.length === 0 ? (
+                <div className="flex justify-center items-center h-[300px]">
+                  <span className="text-gray-500">
+                    Data Riwayat Anggota Belum Tersedia.
+                  </span>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={historyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="year" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="members"
+                      stroke="#FF4081"
+                      dot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>

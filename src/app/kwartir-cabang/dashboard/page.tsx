@@ -303,108 +303,152 @@ export default function Dashboard() {
               <h3 className="text-center text-lg font-bold mb-4">
                 Jumlah Gugus Depan Setiap Kwaran
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={gugusdepanData}
-                    dataKey="jumlahGudep"
-                    nameKey="nama_kwaran"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label
-                  >
-                    {gugusdepanData.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={colors[index % colors.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {gugusdepanData && gugusdepanData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={gugusdepanData}
+                      dataKey="jumlahGudep"
+                      nameKey="nama_kwaran"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      label
+                    >
+                      {gugusdepanData.map((_, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={colors[index % colors.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center text-gray-500 py-12">
+                  Data Jumlah Gugus Depan Setiap Kwaran Belum Tersedia
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
                 <h3 className="text-center text-lg font-bold mb-4">
                   Total Kegiatan Gugus Depan Berdasarkan Jenjang
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={barChartGudep}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="jenjang" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Bar dataKey="total" fill="#8884d8" name="Gugus Depan">
-                      <LabelList dataKey="total" position="top" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                {barChartGudep && barChartGudep.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={barChartGudep}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="jenjang" />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="total" name="Gugus Depan">
+                        {barChartGudep.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={colors[index % colors.length]}
+                          />
+                        ))}
+                        <LabelList dataKey="total" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center text-gray-500 py-12">
+                    Data Total Kegiatan Gugus Depan Berdasarkan Jenjang Tersedia
+                  </div>
+                )}
               </div>
               <div>
                 <h3 className="text-center text-lg font-bold mb-4">
                   Total Kegiatan Kwartir Ranting Berdasarkan Jenjang
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={barChartKwaran}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="jenjang" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Bar dataKey="total" fill="#82ca9d" name="Kwartir Ranting">
-                      <LabelList dataKey="total" position="top" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                {barChartKwaran && barChartKwaran.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={barChartKwaran}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="jenjang" />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="total" name="Kwartir Ranting">
+                        {barChartKwaran.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={colors[index % colors.length]}
+                          />
+                        ))}
+                        <LabelList dataKey="total" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-center text-gray-500 py-12">
+                    Data Total Kegiatan Kwartir Ranting Berdasarkan Jenjang
+                    Belum Tersedia
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-6">
               <h3 className="text-center text-lg font-bold mb-4">
                 Jumlah Anggota per Jenjang di Tiap Kwartir Ranting
               </h3>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                  data={jenjangPerKwaran}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="kwaran"
-                    angle={-15}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="SIAGA" fill="#FFCE56" />
-                  <Bar dataKey="PENGGALANG" fill="#36A2EB" />
-                  <Bar dataKey="PENEGAK" fill="#4BC0C0" />
-                  <Bar dataKey="PANDEGA" fill="#9966FF" />
-                </BarChart>
-              </ResponsiveContainer>
+              {jenjangPerKwaran && jenjangPerKwaran.length > 0 ? (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    data={jenjangPerKwaran}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="kwaran"
+                      angle={-15}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="SIAGA" fill="#FFCE56" />
+                    <Bar dataKey="PENGGALANG" fill="#36A2EB" />
+                    <Bar dataKey="PENEGAK" fill="#4BC0C0" />
+                    <Bar dataKey="PANDEGA" fill="#9966FF" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center text-gray-500 py-12">
+                  Data Jumlah Anggota per Jenjang di Tiap Kwartir Ranting Belum
+                  Tersedia
+                </div>
+              )}
             </div>
 
             <div className="mt-6">
               <h3 className="text-center text-lg font-bold mb-4">
                 Data Anggota Pramuka Setiap Tahun
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={historyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="members"
-                    stroke="#FF4081"
-                    dot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {historyData && historyData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={historyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="year" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="members"
+                      stroke="#FF4081"
+                      dot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center text-gray-500 py-12">
+                  Data Anggota Pramuka Setiap Tahun Belum Tersedia
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

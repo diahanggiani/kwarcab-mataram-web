@@ -198,7 +198,9 @@ export default function Pembina() {
                 </TableHead>
                 <TableHead className="text-center font-bold">Agama</TableHead>
                 <TableHead className="text-center font-bold">Jenjang</TableHead>
-                <TableHead className="text-center font-bold">Nomor Telepon</TableHead>
+                <TableHead className="text-center font-bold">
+                  Nomor Telepon
+                </TableHead>
                 <TableHead className="text-center font-bold">Alamat</TableHead>
                 <TableHead className="text-center font-bold">Aksi</TableHead>
               </TableRow>
@@ -337,17 +339,22 @@ export default function Pembina() {
                   <h2 className="text-xl font-bold mt-2">
                     Nomor Tanda Anggota
                   </h2>
-                  <div className="w-full mx-auto mt-2">
-                    <Input
-                      type="text"
-                      value={editData.nta || ""}
-                      onChange={(e) =>
-                        setEditData({ ...editData, nta: e.target.value })
-                      }
-                      placeholder="Masukkan Nomor Tanda Anggota"
-                      className="w-full border border-gray-500 rounded-lg px-3 py-2"
-                    />
-                  </div>
+                  <Input
+                    type="text"
+                    value={editData.nta || ""}
+                    onChange={(e) => {
+                      // Only allow numbers, max 16 chars
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 16);
+                      setEditData({ ...editData, nta: value });
+                    }}
+                    minLength={14}
+                    maxLength={16}
+                    placeholder="Masukkan Nomor Tanda Anggota (14-16 digit)"
+                    className="w-full border border-gray-500 rounded-lg px-3 py-2"
+                    required
+                  />
                   <h2 className="text-xl font-bold mt-2">Tanggal Lahir</h2>
                   <div className="w-full mx-auto mt-2">
                     <Input
@@ -366,9 +373,13 @@ export default function Pembina() {
                     <Input
                       type="text"
                       value={editData.no_telp || ""}
-                      onChange={(e) =>
-                        setEditData({ ...editData, no_telp: e.target.value })
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 15);
+                        setEditData({ ...editData, no_telp: value });
+                      }}
+                      maxLength={15}
                       placeholder="Masukkan Nomor Telepon Pembina"
                       className="w-full border border-gray-500 rounded-lg px-3 py-2"
                     />

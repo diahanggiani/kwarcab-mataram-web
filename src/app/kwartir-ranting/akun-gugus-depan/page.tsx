@@ -49,10 +49,18 @@ export default function TambahAkun() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [users, setUsers] = useState<UserGugusDepan[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [nama, setNama] = useState("");
-  const [kode, setKode] = useState("");
+  // State untuk tambah akun
+  const [addUsername, setAddUsername] = useState("");
+  const [addPassword, setAddPassword] = useState("");
+  const [addNama, setAddNama] = useState("");
+  const [addKode, setAddKode] = useState("");
+
+  // State untuk edit akun
+  const [editUsername, setEditUsername] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+  const [editNama, setEditNama] = useState("");
+  const [editKode, setEditKode] = useState("");
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -79,7 +87,7 @@ export default function TambahAkun() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password || !nama || !kode) {
+    if (!addUsername || !addPassword || !addNama || !addKode) {
       toast.error("Semua field harus diisi!");
       return;
     }
@@ -91,10 +99,10 @@ export default function TambahAkun() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
-          password,
-          nama,
-          kode,
+          username: addUsername,
+          password: addPassword,
+          nama: addNama,
+          kode: addKode,
         }),
       });
 
@@ -108,16 +116,16 @@ export default function TambahAkun() {
             username: user.username,
             password: user.password,
             gugusDepan: {
-              kode_gusdep: kode,
-              nama_gusdep: nama,
+              kode_gusdep: addKode,
+              nama_gusdep: addNama,
             },
           },
         ]);
         setIsAddOpen(false);
-        setUsername("");
-        setPassword("");
-        setNama("");
-        setKode("");
+        setAddUsername("");
+        setAddPassword("");
+        setAddNama("");
+        setAddKode("");
         toast.success("Akun berhasil ditambahkan!");
       } else if (res.status === 400) {
         const errorData = await res.json();
@@ -158,37 +166,31 @@ export default function TambahAkun() {
 
   const openEditDialog = (user: UserGugusDepan) => {
     setEditId(user.id);
-    setUsername(user.username);
-    setPassword(""); // kosongkan, agar user masukkan ulang kalau mau ganti
-    setNama(user.gugusDepan.nama_gusdep);
-    setKode(user.gugusDepan.kode_gusdep);
+    setEditUsername(user.username);
+    setEditPassword("");
+    setEditNama(user.gugusDepan.nama_gusdep);
+    setEditKode(user.gugusDepan.kode_gusdep);
     setIsEditOpen(true);
   };
+
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password || !nama || !kode) {
+    if (!editUsername || !editNama || !editKode) {
       toast.error("Semua field harus diisi!");
       return;
     }
 
     try {
-      const endpoint = editId
-        ? `/api/user/account/${editId}`
-        : "/api/user/account";
-      const method = editId ? "PUT" : "POST";
-
-      const res = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await fetch(`/api/user/account/${editId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username,
-          password,
-          nama,
-          kode,
+          username: editUsername,
+          password: editPassword, // boleh kosong
+          nama: editNama,
+          kode: editKode,
         }),
       });
 
@@ -196,39 +198,34 @@ export default function TambahAkun() {
         const data = await res.json();
         const updatedUser = {
           id: editId || data.user.id,
-          username,
-          password,
+          username: editUsername,
+          password: editPassword,
           gugusDepan: {
-            kode_gusdep: kode,
-            nama_gusdep: nama,
+            kode_gusdep: editKode,
+            nama_gusdep: editNama,
           },
         };
 
-        if (editId) {
-          setUsers((prev) =>
-            prev.map((user) => (user.id === editId ? updatedUser : user))
-          );
-          setIsEditOpen(false);
-          toast.success("Akun berhasil diperbarui!");
-        } else {
-          setUsers((prev) => [...prev, updatedUser]);
-          setIsAddOpen(false);
-          toast.success("Akun berhasil ditambahkan!");
-        }
+        setUsers((prev) =>
+          prev.map((user) => (user.id === editId ? updatedUser : user))
+        );
+
+        setIsEditOpen(false);
         setEditId(null);
-        setUsername("");
-        setPassword("");
-        setNama("");
-        setKode("");
+        setEditUsername("");
+        setEditPassword("");
+        setEditNama("");
+        setEditKode("");
+        toast.success("Akun berhasil diperbarui!", { duration: 5000 });
       } else {
         const errorData = await res.json();
-        toast.error(errorData.message || "Terjadi kesalahan.");
+        toast.error(errorData.message || "Gagal memperbarui akun.");
       }
-    } catch (error) {
-      console.error("Error submitting account:", error);
-      toast.error("Terjadi kesalahan.");
+    } catch {
+      toast.error("Terjadi kesalahan saat mengubah akun.");
     }
   };
+
 
   const handleDelete = async () => {
     if (!deleteId || !session) return;
@@ -251,7 +248,7 @@ export default function TambahAkun() {
         setUsers(updateUser);
         setDeleteId(null);
         setIsDeleteOpen(false);
-        toast.success("Akun berhasil dihapus!");
+        toast.success("Akun berhasil dihapus!", {duration: 5000});
       }
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -387,21 +384,20 @@ export default function TambahAkun() {
               <div>
                 <h2 className="text-base font-semibold">Username</h2>
                 <Input
-                  type="text"
+                  value={addUsername}
+                  onChange={(e) => setAddUsername(e.target.value)}
                   placeholder="Masukkan Username"
                   className="mt-2"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div>
                 <h2 className="text-base font-semibold mt-2">Password</h2>
                 <Input
                   type="password"
-                  placeholder="Masukkan Password"
+                  value={addPassword}
+                  onChange={(e) => setAddPassword(e.target.value)}
                   className="mt-2"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Masukkan Password"
                 />
               </div>
               <div>
@@ -409,11 +405,10 @@ export default function TambahAkun() {
                   Nama Gugus Depan
                 </h2>
                 <Input
-                  type="text"
-                  placeholder="Masukkan Nama Gugus Depan"
+                  value={addNama}
+                  onChange={(e) => setAddNama(e.target.value)}
                   className="mt-2"
-                  value={nama}
-                  onChange={(e) => setNama(e.target.value)}
+                  placeholder="Masukkan Nama Gugus Depan"
                 />
               </div>
               <div>
@@ -421,11 +416,10 @@ export default function TambahAkun() {
                   Kode Gugus Depan
                 </h2>
                 <Input
-                  type="text"
-                  placeholder="Masukkan Kode Gugus Depan"
+                  value={addKode}
+                  onChange={(e) => setAddKode(e.target.value)}
                   className="mt-2"
-                  value={kode}
-                  onChange={(e) => setKode(e.target.value)}
+                  placeholder="Masukkan kode Gugus Depan"
                 />
               </div>
               <div className="flex justify-center mt-4">
@@ -453,9 +447,9 @@ export default function TambahAkun() {
               <div>
                 <h2 className="text-base font-semibold">Username</h2>
                 <Input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  placeholder="Masukkan Username"
                   className="mt-2"
                 />
               </div>
@@ -465,8 +459,8 @@ export default function TambahAkun() {
                 </h2>
                 <Input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
                   className="mt-2"
                   placeholder="Biarkan kosong jika tidak ingin mengubah password"
                 />
@@ -476,10 +470,10 @@ export default function TambahAkun() {
                   Nama Gugus Depan
                 </h2>
                 <Input
-                  type="text"
-                  value={nama}
-                  onChange={(e) => setNama(e.target.value)}
+                  value={editNama}
+                  onChange={(e) => setEditNama(e.target.value)}
                   className="mt-2"
+                  placeholder="Masukkan Nama Gugus Depan"
                 />
               </div>
               <div>
@@ -487,10 +481,10 @@ export default function TambahAkun() {
                   Kode Gugus Depan
                 </h2>
                 <Input
-                  type="text"
-                  value={kode}
-                  onChange={(e) => setKode(e.target.value)}
+                  value={editKode}
+                  onChange={(e) => setEditKode(e.target.value)}
                   className="mt-2"
+                  placeholder="Masukkan Kode Gugus Depan"
                 />
               </div>
               <div className="flex justify-center mt-4">

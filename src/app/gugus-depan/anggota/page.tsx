@@ -5,10 +5,11 @@ import {
   PlusCircle,
   ListFilter,
   Loader2,
+  Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,6 +86,7 @@ export default function Anggota() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredAjuan, setFilteredAjuan] = useState<string>("ALL");
   const [mounted, setMounted] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -177,6 +179,71 @@ export default function Anggota() {
     fetchProfile();
     fetchMembers();
   }, [session, debouncedSearch, filteredAjuan]);
+
+  const handleExportCSV = () => {
+    setIsExporting(true);
+    try {
+      // Prepare CSV content
+      const headers = [
+        "NTA",
+        "Nama",
+        "Tanggal Lahir",
+        "Jenis Kelamin",
+        "Agama",
+        "Jenjang",
+        "Nomor Telepon",
+        "Alamat",
+        "Tahun Gabung",
+        "Status",
+      ];
+
+      const rows = anggota.map((item) => [
+        item.nta,
+        item.nama_agt,
+        item.tgl_lahir
+          ? new Date(item.tgl_lahir).toLocaleDateString("id-ID")
+          : "-",
+        item.gender === "LAKI_LAKI" ? "Laki-Laki" : "Perempuan",
+        item.agama || "-",
+        formatJenjang(jenjang[item.id_anggota]),
+        item.no_telp || "-",
+        item.alamat || "-",
+        item.tahun_gabung || "-",
+        item.status_agt === "AKTIF" ? "Aktif" : "Non Aktif",
+      ]);
+
+      // Create CSV string
+      let csvContent = headers.join(",") + "\n";
+      rows.forEach((row) => {
+        csvContent += row.map((field) => `"${field}"`).join(",") + "\n";
+      });
+
+      // Create download link
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `anggota_${profile?.nama_gusdep || "gugusdepan"}_${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Data anggota berhasil diekspor ke CSV", {
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast.error("Gagal mengekspor data ke CSV", { duration: 5000 });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const formatJenjang = (jenjang_agt: string | undefined) => {
     if (!jenjang_agt) return "-";
@@ -326,7 +393,23 @@ export default function Anggota() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="bg-green-600 text-white hover:bg-green-700 transition"
+              onClick={handleExportCSV}
+              disabled={isExporting || anggota.length === 0}
+            >
+              {isExporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap ml-2">
+                Export CSV
+              </span>
+            </Button>
             <Link href="/gugus-depan/anggota/tambah-anggota">
               <Button
                 size="sm"
@@ -525,11 +608,18 @@ export default function Anggota() {
                   <Input
                     type="text"
                     value={editData.nta || ""}
-                    onChange={(e) =>
-                      setEditData({ ...editData, nta: e.target.value })
-                    }
-                    placeholder="Masukkan Nomor Tanda Anggota"
+                    onChange={(e) => {
+                      // Only allow numbers, max 16 chars
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 16);
+                      setEditData({ ...editData, nta: value });
+                    }}
+                    minLength={14}
+                    maxLength={16}
+                    placeholder="Masukkan Nomor Tanda Anggota (14-16 digit)"
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
+                    required
                   />
                 </div>
                 <h3 className="text-xl font-bold mt-2">Tanggal Lahir</h3>
@@ -549,11 +639,15 @@ export default function Anggota() {
                   <Input
                     type="text"
                     value={editData.no_telp || ""}
-                    onChange={(e) =>
-                      setEditData({ ...editData, no_telp: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 15);
+                      setEditData({ ...editData, no_telp: value });
+                    }}
+                    maxLength={15}
+                    placeholder="Masukkan Nomor Telepon Pembina"
                     className="w-full border border-gray-500 rounded-lg px-3 py-2"
-                    placeholder="Masukan Nomor Telepon Anggota"
                   />
                 </div>
                 <h3 className="text-xl font-bold mt-2">Alamat</h3>

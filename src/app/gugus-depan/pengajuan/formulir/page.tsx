@@ -16,9 +16,9 @@ import React from "react";
 import toast from "react-hot-toast";
 
 type AjuanData = {
-  nama_ajuan: string;
+  nama_agt: string;
   gender: string;
-  tingkat: string;
+  jenjang_agt: string;
   formulir: string;
 };
 
@@ -26,9 +26,9 @@ export default function FormulirKTA() {
   const { data: session } = useSession();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [ajuan, setAjuan] = useState<AjuanData>({
-    nama_ajuan: "",
+    nama_agt: "",
     gender: "",
-    tingkat: "",
+    jenjang_agt: "",
     formulir: "",
   });
 
@@ -41,8 +41,9 @@ export default function FormulirKTA() {
 
     try {
       const formData = new FormData();
-      formData.append("nama_ajuan", ajuan.nama_ajuan);
-      formData.append("tingkat", ajuan.tingkat);
+      formData.append("nama_agt", ajuan.nama_agt);
+      formData.append("gender", ajuan.gender)
+      formData.append("jenjang_agt", ajuan.jenjang_agt);
       formData.append("formulir", selectedFile);
       formData.append("gusdepKode", session?.user?.kode_gusdep || "");
 
@@ -55,9 +56,9 @@ export default function FormulirKTA() {
         const data = await result.json();
         console.log("Form submitted successfully:", data);
         setAjuan({
-          nama_ajuan: "",
+          nama_agt: "",
           gender: "",
-          tingkat: "",
+          jenjang_agt: "",
           formulir: "",
         });
         setSelectedFile(null);
@@ -157,9 +158,9 @@ export default function FormulirKTA() {
             <h2 className="text-xl font-bold mt-2">Nama Anggota</h2>
             <div className="w-full mx-auto mt-2">
               <Input
-                value={ajuan.nama_ajuan}
+                value={ajuan.nama_agt}
                 onChange={(e) =>
-                  setAjuan({ ...ajuan, nama_ajuan: e.target.value })
+                  setAjuan({ ...ajuan, nama_agt: e.target.value })
                 }
                 type="text"
                 placeholder="Masukkan Nama Anggota"
@@ -184,9 +185,9 @@ export default function FormulirKTA() {
             <h2 className="text-xl font-bold mt-2">Jenjang</h2>
             <div className="w-full mx-auto mt-2">
               <Select
-                value={ajuan.tingkat}
+                value={ajuan.jenjang_agt}
                 onValueChange={(value) =>
-                  setAjuan({ ...ajuan, tingkat: value })
+                  setAjuan({ ...ajuan, jenjang_agt: value })
                 }
               >
                 <SelectTrigger className="w-full border border-gray-500 rounded-lg px-3 py-2">

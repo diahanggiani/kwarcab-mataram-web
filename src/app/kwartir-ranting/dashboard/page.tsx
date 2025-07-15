@@ -125,6 +125,7 @@ export default function Dashboard() {
         const res = await fetch("/api/dashboard/anggotaByYear");
         if (res.ok) {
           const data = await res.json();
+          console.log("History Data: ", data);
           const formatted = data.map(
             (item: { tahun: number; jumlah: number }) => ({
               year: item.tahun.toString(),
@@ -200,13 +201,7 @@ export default function Dashboard() {
       )
     : [];
 
-  if (
-    !mounted ||
-    !session ||
-    !profile ||
-    !anggotaStats ||
-    totalKegiatan.length === 0
-  ) {
+  if (!mounted || !session) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Card className="p-6 flex items-center gap-4">
@@ -287,87 +282,105 @@ export default function Dashboard() {
                 <h3 className="text-center text-lg font-bold mb-4">
                   Jumlah Anggota Laki-Laki dan Perempuan di Setiap Gugus Depan
                 </h3>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart
-                    data={Object.entries(anggotaData).map(([name, data]) => ({
-                      name,
-                      laki: data.LAKI_LAKI || 0,
-                      perempuan: data.PEREMPUAN || 0,
-                    }))}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      angle={-15}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar
-                      dataKey="laki"
-                      stackId="a"
-                      fill="#3366CC"
-                      name="Laki-laki"
-                      barSize={30}
+                {Object.keys(anggotaData).length === 0 ? (
+                  <div className="text-center text-gray-500 py-12">
+                    Data anggota per gugus depan tidak tersedia.
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart
+                      data={Object.entries(anggotaData).map(([name, data]) => ({
+                        name,
+                        laki: data.LAKI_LAKI || 0,
+                        perempuan: data.PEREMPUAN || 0,
+                      }))}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
                     >
-                      <LabelList dataKey="laki" position="top" />
-                    </Bar>
-                    <Bar
-                      dataKey="perempuan"
-                      stackId="a"
-                      fill="#FF668C"
-                      name="Perempuan"
-                      barSize={30}
-                    >
-                      <LabelList dataKey="perempuan" position="top" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-15}
+                        textAnchor="end"
+                        height={60}
+                      />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar
+                        dataKey="laki"
+                        stackId="a"
+                        fill="#3366CC"
+                        name="Laki-laki"
+                        barSize={30}
+                      >
+                        <LabelList dataKey="laki" position="top" />
+                      </Bar>
+                      <Bar
+                        dataKey="perempuan"
+                        stackId="a"
+                        fill="#FF668C"
+                        name="Perempuan"
+                        barSize={30}
+                      >
+                        <LabelList dataKey="perempuan" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
               <div>
                 <h3 className="text-center text-lg font-bold mb-4">
                   Total Kegiatan Gugus Depan Berdasarkan Jenjang
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={barChartGudep}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="jenjang" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Bar dataKey="total" name="Gugus Depan">
-                      {barChartGudep.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={getColorByIndex(index)}
-                        />
-                      ))}
-                      <LabelList dataKey="total" position="top" />
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                {barChartGudep.length === 0 ? (
+                  <div className="text-center text-gray-500 py-12">
+                    Data kegiatan per jenjang tidak tersedia.
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={barChartGudep}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="jenjang" />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="total" name="Gugus Depan">
+                        {barChartGudep.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={getColorByIndex(index)}
+                          />
+                        ))}
+                        <LabelList dataKey="total" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
             <div className="mt-6">
               <h3 className="text-center text-lg font-bold mb-4">
-                Data Anggota Pramuka Setiap Tahun
+                Total Anggota {profile?.nama_kwaran} Pramuka Setiap Tahun
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={historyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="members"
-                    stroke="#FF4081"
-                    dot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {historyData.length === 0 ? (
+                <div className="text-center text-gray-500 py-12">
+                  Data Anggota {profile?.nama_kwaran} per Tahun Tidak Tersedia.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={historyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="year" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="members"
+                      stroke="#FF4081"
+                      dot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>

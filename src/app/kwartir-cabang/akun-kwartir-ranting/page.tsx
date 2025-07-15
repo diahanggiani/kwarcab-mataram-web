@@ -89,8 +89,6 @@ export default function TambahAkun() {
     }
 
     try {
-      console.log("Sending payload:", { username, password, nama, kode });
-
       const res = await fetch("/api/user/account", {
         method: "POST",
         headers: {
@@ -191,22 +189,19 @@ export default function TambahAkun() {
       });
 
       if (res.ok) {
-        const updatedUser = await res.json();
+        const data = await res.json();
+        const updatedUser = {
+          id: editId || data.user.id,
+          username: editUsername,
+          password: editPassword,
+          kwaran: {
+            kode_kwaran: editKode,
+            nama_kwaran: editNama,
+          },
+        };
 
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.id === editId
-              ? {
-                  ...user,
-                  username: updatedUser.username,
-                  password: updatedUser.password,
-                  kwaran: {
-                    nama_kwaran: updatedUser.kwaran.nama_kwaran,
-                    kode_kwaran: updatedUser.kwaran.kode_kwaran,
-                  },
-                }
-              : user
-          )
+        setUsers((prev) =>
+          prev.map((user) => (user.id === editId ? updatedUser : user))
         );
 
         toast.success("Akun berhasil diperbarui!", {
@@ -220,7 +215,17 @@ export default function TambahAkun() {
         setEditKode("");
       } else {
         const errorData = await res.json();
-        toast.error(errorData.message || "Gagal mengedit akun.");
+
+        if (
+          errorData.message ===
+          "This code and name are already taken. Please use different values."
+        ) {
+          toast.error("Kode dan nama kwaran sudah digunakan.");
+        } else if (errorData.message === "Username already exists") {
+          toast.error("Username sudah digunakan.");
+        } else {
+          toast.error(errorData.message || "Gagal mengedit akun.");
+        }
       }
     } catch (error) {
       console.error("Error updating account:", error);
@@ -343,10 +348,10 @@ export default function TambahAkun() {
                     </TableCell>
                     <TableCell className="text-center">******</TableCell>
                     <TableCell className="text-center font-semibold">
-                      {user.kwaran.nama_kwaran}
+                      {user.kwaran?.nama_kwaran || "-"}
                     </TableCell>
                     <TableCell className="text-center font-semibold">
-                      {user.kwaran.kode_kwaran}
+                      {user.kwaran?.kode_kwaran || "-"}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center items-center gap-2">

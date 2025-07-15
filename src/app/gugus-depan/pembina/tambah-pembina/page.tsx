@@ -139,15 +139,17 @@ export default function TambahPembina() {
             <div className="w-full mx-auto mt-2">
               <Input
                 type="text"
-                value={pembina.nta}
-                onChange={(e) =>
-                  setPembina({
-                    ...pembina,
-                    nta: e.target.value,
-                  })
-                }
-                placeholder="Masukkan Nomor Tanda Anggota"
+                value={pembina.nta || ""}
+                onChange={(e) => {
+                  // Only allow numbers, max 16 chars
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 16);
+                  setPembina({ ...pembina, nta: value });
+                }}
+                minLength={14}
+                maxLength={16}
+                placeholder="Masukkan Nomor Tanda Anggota (14-16 digit)"
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
+                required
               />
             </div>
             <h3 className="text-xl font-bold mt-2">Tanggal Lahir</h3>
@@ -166,10 +168,12 @@ export default function TambahPembina() {
             <div className="w-full mx-auto mt-2">
               <Input
                 type="text"
-                value={pembina.no_telp}
-                onChange={(e) =>
-                  setPembina({ ...pembina, no_telp: e.target.value })
-                }
+                value={pembina.no_telp || ""}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 15);
+                  setPembina({ ...pembina, no_telp: value });
+                }}
+                maxLength={15}
                 placeholder="Masukkan Nomor Telepon Pembina"
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />

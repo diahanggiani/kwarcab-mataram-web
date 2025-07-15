@@ -160,11 +160,16 @@ export default function TambahAnggota() {
               <Input
                 type="text"
                 value={anggota.nta}
-                onChange={(e) =>
-                  setAnggota({ ...anggota, nta: e.target.value })
-                }
-                placeholder="Masukkan Nomor Tanda Anggota"
+                onChange={(e) => {
+                  // Only allow numbers, max 16 chars
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 16);
+                  setAnggota({ ...anggota, nta: value });
+                }}
+                minLength={14}
+                maxLength={16}
+                placeholder="Masukkan Nomor Tanda Anggota (14-16 digit)"
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
+                required
               />
             </div>
             <h3 className="text-xl font-bold mt-2">Tanggal Lahir</h3>
@@ -183,11 +188,13 @@ export default function TambahAnggota() {
             <div className="w-full mx-auto mt-2">
               <Input
                 type="text"
-                value={anggota.no_telp}
-                onChange={(e) =>
-                  setAnggota({ ...anggota, no_telp: e.target.value })
-                }
-                placeholder="Masukkan Nomor Telepon Anggota"
+                value={anggota.no_telp || ""}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 15);
+                  setAnggota({ ...anggota, no_telp: value });
+                }}
+                maxLength={15}
+                placeholder="Masukkan Nomor Telepon Pembina"
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>

@@ -59,8 +59,9 @@ import {
 
 type AjuanData = {
   id_ajuan: string;
-  tingkat: string;
-  nama_ajuan: string;
+  createdAt: string;
+  jenjang_agt: string;
+  nama_agt: string;
   gender: string;
   formulir: string | null;
   status: string | null;
@@ -127,8 +128,9 @@ export default function StatusPengajuan() {
     if (!editId || !editData) return;
 
     const formData = new FormData();
-    formData.append("nama_ajuan", editData.nama_ajuan);
-    formData.append("tingkat", editData.tingkat);
+    formData.append("nama_agt", editData.nama_agt);
+    formData.append("gender", editData.gender);
+    formData.append("jenjang_agt", editData.jenjang_agt);
     if (selectedFile) {
       formData.append("formulir", selectedFile);
     }
@@ -186,6 +188,15 @@ export default function StatusPengajuan() {
   const openDeleteDialog = (id: string) => {
     setDeleteId(id);
     setIsDeleteOpen(true);
+  };
+
+  const formatJenjang = (jenjang_agt: string | undefined) => {
+    if (!jenjang_agt) return "-";
+    return jenjang_agt
+      .toLowerCase()
+      .split("_")
+      .map((kata: string) => kata.charAt(0).toUpperCase() + kata.slice(1))
+      .join(" ");
   };
 
   if (!mounted || !session || !ajuan) {
@@ -258,10 +269,16 @@ export default function StatusPengajuan() {
                   No
                 </TableHead>
                 <TableHead className="text-center font-bold text-base">
+                  Tanggal Pengajuan
+                </TableHead>
+                <TableHead className="text-center font-bold text-base">
                   Nama
                 </TableHead>
                 <TableHead className="text-center font-bold text-base">
                   Jenjang
+                </TableHead>
+                <TableHead className="text-center font-bold text-base">
+                  Jenis Kelamin
                 </TableHead>
                 <TableHead className="text-center font-bold text-base">
                   Formulir
@@ -291,11 +308,17 @@ export default function StatusPengajuan() {
                     className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
                   >
                     <TableCell className="text-center">{index + 1}</TableCell>
+                    <TableCell className="text-center">
+                      {new Date(ajuan.createdAt).toLocaleDateString("id-ID")}
+                    </TableCell>
                     <TableCell className="text-center font-semibold">
-                      {ajuan.nama_ajuan}
+                      {ajuan.nama_agt}
                     </TableCell>
                     <TableCell className="text-center">
-                      {ajuan.tingkat || "-"}
+                      {formatJenjang(ajuan.jenjang_agt)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {ajuan.gender === "LAKI_LAKI" ? "Laki-Laki" : "Perempuan"}
                     </TableCell>
                     <TableCell className="text-center">
                       {ajuan.formulir ? (
@@ -344,6 +367,10 @@ export default function StatusPengajuan() {
                             size="sm"
                             className="h-8 w-8 p-0 flex items-center justify-center border border-amber-950 text-amber-950 hover:bg-amber-950 hover:text-white transition-colors"
                             onClick={() => openEditDialog(ajuan.id_ajuan)}
+                            hidden={
+                              ajuan.status === "DITERIMA" ||
+                              ajuan.status === "DITOLAK"
+                            }
                           >
                             <Pencil className="h-5 w-5" />
                           </Button>
@@ -354,6 +381,10 @@ export default function StatusPengajuan() {
                             size="sm"
                             className="h-8 w-8 p-0 flex items-center justify-center border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors"
                             onClick={() => openDeleteDialog(ajuan.id_ajuan)}
+                            hidden={
+                              ajuan.status === "DITERIMA" ||
+                              ajuan.status === "DITOLAK"
+                            }
                           >
                             <Trash2 className="h-5 w-5" />
                           </Button>
@@ -379,10 +410,10 @@ export default function StatusPengajuan() {
             <h2 className="text-xl font-bold mt-2">Nama Anggota</h2>
             <div className="w-full mx-auto mt-2">
               <Input
-                value={editData?.nama_ajuan || ""}
+                value={editData?.nama_agt || ""}
                 onChange={(e) =>
                   setEditData((prev) =>
-                    prev ? { ...prev, nama_ajuan: e.target.value } : null
+                    prev ? { ...prev, nama_agt: e.target.value } : null
                   )
                 }
               />
@@ -409,10 +440,10 @@ export default function StatusPengajuan() {
             <h2 className="text-xl font-bold mt-2">Jenjang</h2>
             <div className="w-full mx-auto mt-2">
               <Select
-                value={editData?.tingkat || ""}
+                value={editData?.jenjang_agt || ""}
                 onValueChange={(value) =>
                   setEditData((prev) =>
-                    prev ? { ...prev, tingkat: value } : null
+                    prev ? { ...prev, jenjang_agt: value } : null
                   )
                 }
               >
@@ -472,7 +503,7 @@ export default function StatusPengajuan() {
               className="w-50 bg-amber-950 text-white text-sm px-3 py-1 rounded-md transition-transform transform hover:bg-amber-800 hover:scale-105 hover:shadow-lg"
               type="submit"
             >
-              Kirim Pengajuan
+              Edit Pengajuan
             </Button>
           </div>
         </DialogContent>
