@@ -214,6 +214,7 @@ model Ajuan {
   formulir    String         @db.Text
   status      Status?        @default(MENUNGGU)
   nta         String?
+  keterangan  String?
   gusdepKode  String
   gugusDepan  GugusDepan     @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
   kwarcabKode String

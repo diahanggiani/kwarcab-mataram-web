@@ -4,14 +4,12 @@ import { Prisma, Role, User } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { hash } from "bcrypt";
+import { formatKode } from "@/lib/helpers/format";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // keperluan testing (nanti dihapus)
   // const session = await getSessionOrToken(req);
   // console.log("SESSION DEBUG:", session);
@@ -20,13 +18,7 @@ export async function PATCH(
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role === "USER_SUPERADMIN") {
-    return NextResponse.json(
-      {
-        message:
-          "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can delete account",
-      },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can delete account" }, { status: 403 });
   }
 
   try {
@@ -34,12 +26,11 @@ export async function PATCH(
     const body = await req.json();
     const { username, password, kode } = body;
     const nama = body.nama?.trim();
+    const kodeRaw = body.kode;
+    // const kodeRaw: string | undefined = body.kode;
 
     if (!username && !password && !nama && !kode) {
-      return NextResponse.json(
-        { message: "At least one field is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "At least one field is required" }, { status: 400 });
     }
 
     const targetUser = await prisma.user.findUnique({
@@ -61,33 +52,28 @@ export async function PATCH(
       );
     }
 
-    if (kode && !/^\S+$/.test(kode)) {
-      return NextResponse.json(
-        { message: "Kode cannot contain spaces" },
-        { status: 400 }
-      );
+    let formattedKode: string | undefined = undefined;
+    if (kodeRaw) {
+      if (!/^\S+$/.test(kodeRaw)) {
+        return NextResponse.json({ message: "Kode cannot contain spaces" }, { status: 400 });
+      }
+
+      try {
+        formattedKode = formatKode(targetUser.role, kodeRaw);
+      } catch (err) {
+        return NextResponse.json({ message: err instanceof Error ? err.message : "Invalid kode format" }, { status: 400 });
+      }
     }
 
-    if (
-      password &&
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)
-    ) {
+    if (password && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
       return NextResponse.json(
-        {
-          message:
-            "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers.",
-        },
-        { status: 400 }
-      );
+        { message: "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers." }, { status: 400 });
     }
 
     // validasi username
     if (username) {
-      const existingUser = await prisma.user.findUnique({
-        where: { username },
-      });
-      if (existingUser && existingUser.id !== id) {
-        // supaya tidak menolak jika user tetap pakai username miliknya sendiri (saat tidak mengubah username)
+      const existingUser = await prisma.user.findUnique({ where: { username } });
+      if (existingUser && existingUser.id !== id) { // supaya tidak menolak jika user tetap pakai username miliknya sendiri (saat tidak mengubah username)
         return NextResponse.json(
           { message: "Username already exists" },
           { status: 400 }
@@ -95,12 +81,12 @@ export async function PATCH(
       }
     }
 
-    // validasi nama & kode
-    if ((nama || kode) && targetUser.role === Role.USER_KWARAN) {
+    // validasi nama & kode agar tidak duplikat
+    if ((nama || formattedKode) && targetUser.role === Role.USER_KWARAN) {
       const orClause: Prisma.KwaranWhereInput[] = [];
 
       if (nama) orClause.push({ nama_kwaran: nama });
-      if (kode) orClause.push({ kode_kwaran: kode });
+      if (formattedKode) orClause.push({ kode_kwaran: formattedKode });
 
       const existingKwaran = await prisma.kwaran.findFirst({
         where: {
@@ -120,11 +106,11 @@ export async function PATCH(
       }
     }
 
-    if ((nama || kode) && targetUser.role === Role.USER_GUSDEP) {
+    if ((nama || formattedKode) && targetUser.role === Role.USER_GUSDEP) {
       const orClause: Prisma.GugusDepanWhereInput[] = [];
 
       if (nama) orClause.push({ nama_gusdep: nama });
-      if (kode) orClause.push({ kode_gusdep: kode });
+      if (formattedKode) orClause.push({ kode_gusdep: formattedKode });
 
       const existingGusdep = await prisma.gugusDepan.findFirst({
         where: {
@@ -163,23 +149,20 @@ export async function PATCH(
     }
 
     // update entitas terkait
-    if (session.user.role === Role.USER_KWARCAB && targetUser.kwaran) {
+    if (targetUser.role === Role.USER_KWARAN && (nama || formattedKode)) {
       await prisma.kwaran.update({
-        where: { kode_kwaran: targetUser.kwaran.kode_kwaran },
+        where: { kode_kwaran: targetUser.kwaran?.kode_kwaran },
         data: {
           ...(nama && { nama_kwaran: nama }),
-          ...(kode && { kode_kwaran: kode }),
+          ...(formattedKode && { kode_kwaran: formattedKode }),
         },
       });
-    } else if (
-      session.user.role === Role.USER_KWARAN &&
-      targetUser.gugusDepan
-    ) {
+    } else if (targetUser.role === Role.USER_GUSDEP && (nama || formattedKode)) {
       await prisma.gugusDepan.update({
-        where: { kode_gusdep: targetUser.gugusDepan.kode_gusdep },
+        where: { kode_gusdep: targetUser.gugusDepan?.kode_gusdep },
         data: {
           ...(nama && { nama_gusdep: nama }),
-          ...(kode && { kode_gusdep: kode }),
+          ...(formattedKode && { kode_gusdep: formattedKode }),
         },
       });
     }

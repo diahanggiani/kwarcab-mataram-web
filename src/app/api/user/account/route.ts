@@ -4,6 +4,9 @@ import { hash } from "bcrypt";
 import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { formatKode } from "@/lib/helpers/format";
+import { generateAkunWhereClause } from "@/lib/helpers/queryClause";
+
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
@@ -54,6 +57,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    let newRole: Role;
+
+    // kwarcab bisa membuat user dengan role kwaran
+    if (session.user.role === Role.USER_KWARCAB) {
+      newRole = Role.USER_KWARAN;
+
+      // kwaran bisa membuat user dengan role gusdep
+    } else if (session.user.role === Role.USER_KWARAN) {
+      newRole = Role.USER_GUSDEP;
+
+      // gusdep tidak bisa membuat akun untuk dirinya sendiri ataupun akun untuk gusdep lain
+    } else {
+      return NextResponse.json(
+        { message: "You are not allowed to create users" },
+        { status: 403 }
+      );
+    }
+
+    let formattedKode: string;
+    try {
+      formattedKode = formatKode(newRole, kode);
+    } catch (err) {
+      return NextResponse.json(
+        { message: err instanceof Error ? err.message: "Invalid kode format" }, { status: 400 }
+      );
+    }
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passwordRegex.test(password)) {
       return NextResponse.json(
@@ -73,37 +103,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let newRole: Role;
-
-    // kwarcab bisa membuat user dengan role kwaran
-    if (session.user.role === Role.USER_KWARCAB) {
-      newRole = Role.USER_KWARAN;
-
-      // kwaran bisa membuat user dengan role gusdep
-    } else if (session.user.role === Role.USER_KWARAN) {
-      newRole = Role.USER_GUSDEP;
-
-      // gusdep tidak bisa membuat akun untuk dirinya sendiri ataupun akun untuk gusdep lain
-    } else {
-      return NextResponse.json(
-        { message: "You are not allowed to create users" },
-        { status: 403 }
-      );
-    }
-
     // cek apakah kode & nama sudah dipakai dalam entitas terkait
     let entityExists;
     if (newRole === "USER_GUSDEP") {
       entityExists = await prisma.gugusDepan.findFirst({
-        where: { OR: [{ kode_gusdep: kode }, { nama_gusdep: nama }] },
+        where: { OR: [{ kode_gusdep: formattedKode }, { nama_gusdep: nama }] },
       });
     } else if (newRole === "USER_KWARAN") {
       entityExists = await prisma.kwaran.findFirst({
-        where: { OR: [{ kode_kwaran: kode }, { nama_kwaran: nama }] },
+        where: { OR: [{ kode_kwaran: formattedKode }, { nama_kwaran: nama }] },
       });
     } else if (newRole === "USER_KWARCAB") {
       entityExists = await prisma.kwarcab.findFirst({
-        where: { OR: [{ kode_kwarcab: kode }, { nama_kwarcab: nama }] },
+        where: { OR: [{ kode_kwarcab: formattedKode }, { nama_kwarcab: nama }] },
       });
     }
     if (entityExists) {
@@ -140,7 +152,7 @@ export async function POST(req: NextRequest) {
           // await prisma.gugusDepan.create({
           await tx.gugusDepan.create({
             data: {
-              kode_gusdep: kode,
+              kode_gusdep: formattedKode,
               nama_gusdep: nama,
               kwaran: { connect: { kode_kwaran: session.user.kode_kwaran } }, // ambil kode kwaran dari token
               user: { connect: { id: user.id } },
@@ -153,7 +165,7 @@ export async function POST(req: NextRequest) {
           // await prisma.kwaran.create({
           await tx.kwaran.create({
             data: {
-              kode_kwaran: kode,
+              kode_kwaran: formattedKode,
               nama_kwaran: nama,
               kwarcab: { connect: { kode_kwarcab: session.user.kode_kwarcab } }, // ambil kode kwarcab dari token
               user: { connect: { id: user.id } },
@@ -201,6 +213,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
+    const searchQuery = searchParams.get("search") || undefined;
 
     // pagination
     const page = parseInt(searchParams.get("page") || "1");
@@ -209,15 +222,21 @@ export async function GET(req: NextRequest) {
     let accounts = [];
 
     if (session.user.role === Role.USER_KWARCAB) {
-      accounts = await prisma.user.findMany({
-        where: {
+      const whereClause = generateAkunWhereClause(
+        {
           role: Role.USER_KWARAN,
+          createdById: session.user.id,
           kwaran: {
             kwarcab: {
               kode_kwarcab: session.user.kode_kwarcab,
             },
           },
         },
+        searchQuery
+      );
+
+      accounts = await prisma.user.findMany({
+        where: whereClause,
         select: {
           id: true,
           username: true,
@@ -234,15 +253,21 @@ export async function GET(req: NextRequest) {
         take: limit,
       });
     } else if (session.user.role === Role.USER_KWARAN) {
-      accounts = await prisma.user.findMany({
-        where: {
+      const whereClause = generateAkunWhereClause(
+        {
           role: Role.USER_GUSDEP,
+          createdById: session.user.id,
           gugusDepan: {
             kwaran: {
               kode_kwaran: session.user.kode_kwaran,
             },
           },
         },
+        searchQuery
+      );
+
+      accounts = await prisma.user.findMany({
+        where: whereClause,
         select: {
           id: true,
           username: true,
@@ -264,7 +289,7 @@ export async function GET(req: NextRequest) {
         { status: 403 }
       );
     }
-
+    
     return NextResponse.json({ accounts });
   } catch (error) {
     console.error("Error getting accounts:", error);

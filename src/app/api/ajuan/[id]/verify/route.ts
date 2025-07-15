@@ -39,13 +39,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const body = await req.json();
     const { status } = body;
-    const rawNta = body.nta?.replace(/\D/g, "");
+    const rawNta = body.nta?.replace(/\D/g, ""), keterangan = body.keterangan?.trim();
     
+    const updateData: Partial<Prisma.AjuanUpdateInput> = {};
+
     if (!isValidEnum("Status", status)) {
       return NextResponse.json({ message: "Invalid status" }, { status: 400 });
     }
 
-    const updateData: Partial<Prisma.AjuanUpdateInput> = {};
+    if (keterangan) {
+      if (keterangan.split(/\s+/).length > 300) {
+        return NextResponse.json({ message: "The note is too long (max 300 words)" }, { status: 400 });
+      }
+      updateData.keterangan = keterangan;
+    }
 
     if (status) updateData.status = status;
     // if (rawNta) updateData.nta = rawNta;

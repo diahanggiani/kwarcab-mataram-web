@@ -34,5 +34,21 @@ export const generateAjuanWhereClause = (
 ): Prisma.AjuanWhereInput => ({
     ...base,
     ...(statusFilter ? { status: statusFilter } : {}),
-    ...(searchQuery ? { nama_ajuan: { contains: searchQuery, mode: "insensitive" } } : {}),
+    ...(searchQuery ? { nama_agt: { contains: searchQuery, mode: "insensitive" } } : {}),
+});
+
+// search nama akun
+export const generateAkunWhereClause = (
+  base: Prisma.UserWhereInput,
+  searchQuery?: string
+): Prisma.UserWhereInput => ({
+  ...base,
+  ...(searchQuery
+    ? {
+        OR: [
+          { kwaran: { nama_kwaran: { contains: searchQuery, mode: "insensitive" } } },
+          { gugusDepan: { nama_gusdep: { contains: searchQuery, mode: "insensitive" } } },
+        ],
+      }
+    : {}),
 });
