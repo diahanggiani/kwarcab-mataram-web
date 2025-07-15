@@ -148,6 +148,7 @@ model Pembina {
   tgl_lahir   DateTime
   gender      Gender
   agama       Agama
+  no_telp     String?
   alamat      String
   jenjang_pbn JenjangPembina
   gusdepKode  String

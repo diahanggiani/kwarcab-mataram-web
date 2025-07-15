@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { getGusdepKodeByRegion } from "@/lib/helpers/getGusdep";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
 import { generatePembinaWhereClause } from "@/lib/helpers/queryClause";
+import { formatNta } from "@/lib/helpers/format";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
@@ -23,10 +24,11 @@ export async function POST (req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { tgl_lahir, gender, agama, jenjang_pbn } = body;
-        const nama_pbn = body.nama_pbn?.trim(), nta = body.nta?.trim(), alamat = body.alamat?.trim();
+        const { tgl_lahir, gender, agama, jenjang_pbn, no_telp } = body;
+        const nama_pbn = body.nama_pbn?.trim(), alamat = body.alamat?.trim();
+        const rawNta = body.nta?.replace(/\D/g, "");
 
-        if (!nama_pbn || !nta || !tgl_lahir || !alamat || !gender || !agama || !jenjang_pbn) {
+        if (!nama_pbn || !rawNta || !tgl_lahir || !alamat || !gender || !agama || !jenjang_pbn || !no_telp) {
             return NextResponse.json({ message: "All fields are required" }, { status: 400 });
         }
 
@@ -42,9 +44,21 @@ export async function POST (req: NextRequest) {
             return NextResponse.json({ message: "Invalid jenjang pembina" }, { status: 400 });
         }
 
-        const existingPembina = await prisma.pembina.findUnique({ where: { nta } });
+        if (rawNta.length < 14 || rawNta.length > 16) {
+            return NextResponse.json({ message: "NTA must be 14–16 digit numbers" }, { status: 400 });
+        }
+        
+        // format nta bertitik (XXXX.XX.XXX.XXXXX)
+        const formattedNta = formatNta(rawNta);
+
+        const existingPembina = await prisma.pembina.findUnique({ where: { nta: formattedNta } });
         if (existingPembina) {
             return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+        }
+
+        // format nomor telepon
+        if (no_telp && !/^[0-9]{1,15}$/.test(no_telp)) {
+            return NextResponse.json({ message: "The phone number may only contain numbers and a max 15 digits." }, { status: 400 });
         }
 
         if (!session.user.kode_gusdep) {
@@ -149,6 +163,7 @@ export async function GET(req: NextRequest) {
               gender: pbn.gender,
               agama: pbn.agama,
               alamat: pbn.alamat,
+              no_telp: pbn.no_telp,
               jenjang_pbn: pbn.jenjang_pbn,
               gugus_depan: pbn.gugusDepan?.nama_gusdep ?? null,
             }));
