@@ -10,15 +10,15 @@ import path from "path";
 import { generateAjuanWhereClause } from "@/lib/helpers/queryClause";
 
 // keperluan testing (nanti dihapus)
-// import { getSessionOrToken } from "@/lib/getSessionOrToken";
+import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
 export async function POST(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(req);
-    // console.log("SESSION DEBUG:", session);
+    const session = await getSessionOrToken(req);
+    console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "USER_GUSDEP") {
     return NextResponse.json({ message: "Unauthorized: Only 'Gugus Depan' users can submit form" }, { status: 403 });

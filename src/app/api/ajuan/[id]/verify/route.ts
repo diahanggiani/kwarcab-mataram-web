@@ -47,7 +47,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const updateData: Partial<Prisma.AjuanUpdateInput> = {};
 
-    // if (status) updateData.status = status;
+    if (status) updateData.status = status;
     // if (rawNta) updateData.nta = rawNta;
 
     // jika status DITERIMA
@@ -69,17 +69,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       }
 
       // status diterima & nta terisi = otomatis masuk ke daftar anggota
-      await prisma.anggota.create({
-        data: {
-          nta: formattedNta,
-          nama_agt: ajuan.nama_agt,
-          gender: ajuan.gender,
-          jenjang_agt: ajuan.jenjang_agt,
-          status_agt: "AKTIF",
-          gusdepKode: ajuan.gusdepKode,
-        },
-      });
-
+      await prisma.$transaction([
+        prisma.anggota.create({
+          data: {
+            nta: formattedNta,
+            nama_agt: ajuan.nama_agt,
+            gender: ajuan.gender,
+            jenjang_agt: ajuan.jenjang_agt,
+            status_agt: "AKTIF",
+            gusdepKode: ajuan.gusdepKode,
+          },
+        }),
+        prisma.riwayatJenjang.create({
+          data: {
+            anggota: { connect: { nta: formattedNta } },
+            jenjang_agt: ajuan.jenjang_agt!,
+            tgl_perubahan: new Date(),
+          },
+        }),
+      ]);
+      
       // hapus file ajuan dari db jika ada (supaya db ga penuh krn status jg sudah diterima)
       if (ajuan.formulir) {
         const pathParts = ajuan.formulir.split("/");
