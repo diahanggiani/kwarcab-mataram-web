@@ -8,7 +8,13 @@ export const generateWhereClause = (
 ): Prisma.AnggotaWhereInput => ({
     ...base,
     ...(statusFilter ? { status_agt: statusFilter } : {}),
-    ...(searchQuery ? { nama_agt: { contains: searchQuery, mode: "insensitive" } } : {}),
+    // ...(searchQuery ? { nama_agt: { contains: searchQuery, mode: "insensitive" } } : {}),
+    ...(searchQuery ? {
+        OR: [
+            { nama_agt: { contains: searchQuery, mode: "insensitive" } },
+            { nta: { contains: searchQuery, mode: "insensitive" } },
+        ],
+        } : {}),
 });
 
 // search pembina

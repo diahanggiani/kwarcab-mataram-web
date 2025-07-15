@@ -14,8 +14,8 @@ import { generateAjuanWhereClause } from "@/lib/helpers/queryClause";
 
 export async function POST(req: NextRequest) {
   // keperluan testing (nanti dihapus)
-  //   const session = await getSessionOrToken(req);
-  //   console.log("SESSION DEBUG:", session);
+    // const session = await getSessionOrToken(req);
+    // console.log("SESSION DEBUG:", session);
 
   // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
@@ -26,8 +26,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const formData = await req.formData();
-    const nama_ajuan = formData.get("nama_ajuan")?.toString().trim();
-    const tingkat = formData.get("tingkat")?.toString().trim();
+    const nama_agt = formData.get("nama_agt")?.toString().trim();
+    const jenjang_agt = formData.get("jenjang_agt")?.toString().trim();
+    const gender = formData.get("gender")?.toString().trim();
     const file = formData.get("formulir") as File;
 
     // query untuk mencari kode_kwarcab berdasarkan kode_gusdep
@@ -49,12 +50,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Kode kwarcab tidak ditemukan" }, { status: 400 });
     }
 
-    if (!nama_ajuan || !tingkat || !file) {
+    if (!nama_agt || !jenjang_agt || !gender || !file) {
       return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
-
-    if (!isValidEnum("Tingkat", tingkat)) {
+    
+    if (!isValidEnum("JenjangAnggota", jenjang_agt)) {
       return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
+    }
+
+    if (!isValidEnum("Gender", gender)) {
+      return NextResponse.json({ message: "Invalid gender" }, { status: 400 });
     }
 
     if (file.type !== "application/pdf") {
@@ -93,11 +98,12 @@ export async function POST(req: NextRequest) {
 
     const newAjuan = await prisma.ajuan.create({
       data: {
-        nama_ajuan,
-        tingkat,
+        nama_agt,
+        jenjang_agt,
+        gender,
         formulir: url,
         gusdepKode: session.user.kode_gusdep!,
-        kwarcabKode: kode_kwarcab,
+        kwarcabKode: kode_kwarcab
       },
     });
 
@@ -174,6 +180,7 @@ export async function GET(req: NextRequest) {
         skip: (page - 1) * limit,
         take: limit
       });
+
     }
 
     return NextResponse.json({ data: ajuanList, page, limit });

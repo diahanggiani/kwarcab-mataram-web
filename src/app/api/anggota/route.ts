@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { getGusdepKodeByRegion } from "@/lib/helpers/getGusdep";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
 import { generateWhereClause } from "@/lib/helpers/queryClause";
+import { formatNta } from "@/lib/helpers/format";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
@@ -23,10 +24,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { tgl_lahir, gender, agama, status_agt, tahun_gabung, jenjang_agt, tgl_perubahan } = body;
-    const nama_agt = body.nama_agt?.trim(), nta = body.nta?.trim(), alamat = body.alamat?.trim();
+    const { tgl_lahir, gender, agama, status_agt, tahun_gabung, jenjang_agt, tgl_perubahan, no_telp } = body;
+    // const nama_agt = body.nama_agt?.trim(), nta = body.nta?.trim(), alamat = body.alamat?.trim();
+    const nama_agt = body.nama_agt?.trim(), alamat = body.alamat?.trim();
+    const rawNta = body.nta?.replace(/\D/g, "");
 
-    if (!nama_agt || !nta || !tgl_lahir || !alamat || !gender || !agama || !status_agt || !tahun_gabung || !jenjang_agt || !tgl_perubahan) {
+    if (!nama_agt || !rawNta || !tgl_lahir || !alamat || !gender || !agama || !status_agt || !tahun_gabung || !jenjang_agt || !tgl_perubahan || !no_telp) {
       return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
@@ -46,9 +49,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Invalid jenjang anggota" }, { status: 400 });
     }
 
-    const existingAnggota = await prisma.anggota.findUnique({ where: { nta } });
+    if (rawNta.length < 14 || rawNta.length > 16) {
+      return NextResponse.json({ message: "NTA must be 14–16 digit numbers" }, { status: 400 });
+    }
+
+    // format nta bertitik (XXXX.XX.XXX.XXXXX)
+    const formattedNta = formatNta(rawNta);
+
+    const existingAnggota = await prisma.anggota.findUnique({ where: { nta: formattedNta } });
     if (existingAnggota) {
       return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+    }
+
+    // format nomor telepon
+    if (no_telp && !/^[0-9]{1,15}$/.test(no_telp)) {
+      return NextResponse.json({ message: "The phone number may only contain numbers and a max 15 digits." }, { status: 400 });
     }
 
     if (!session.user.kode_gusdep) {
@@ -59,11 +74,12 @@ export async function POST(req: NextRequest) {
       prisma.anggota.create({
         data: {
           nama_agt,
-          nta,
+          nta: formattedNta,
           alamat,
           tgl_lahir: new Date(tgl_lahir),
           gender,
           agama,
+          no_telp,
           status_agt,
           tahun_gabung: parseInt(tahun_gabung),
           jenjang_agt,
@@ -72,7 +88,8 @@ export async function POST(req: NextRequest) {
       }),
       prisma.riwayatJenjang.create({
         data: {
-          anggota: { connect: { nta: nta.trim() } },
+          // anggota: { connect: { nta: nta.trim() } },
+          anggota: { connect: { nta: formattedNta } },
           jenjang_agt,
           tgl_perubahan: new Date(tgl_perubahan),
         },
@@ -181,6 +198,7 @@ export async function GET(req: NextRequest) {
       gender: agt.gender,
       agama: agt.agama,
       alamat: agt.alamat,
+      no_telp: agt.no_telp,
       status_agt: agt.status_agt,
       jenjang_agt: agt.jenjang_agt,
       gugus_depan: agt.gugusDepan?.nama_gusdep ?? null,

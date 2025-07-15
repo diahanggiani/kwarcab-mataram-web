@@ -1,11 +1,107 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { hash } from 'bcrypt';
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  // keperluan testing (nanti dihapus)
+    // const session = await getSessionOrToken(req);
+    // console.log("SESSION DEBUG:", session);
+
+    // session yang asli (nanti uncomment)
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user.role === "USER_SUPERADMIN") {
+        return NextResponse.json({ message: "Unauthorized: Only 'Kwarcab/Kwaran/Gusdep' users can delete account" }, { status: 403 });
+    }
+
+    try {
+        const { id } = await params;
+        const body = await req.json();
+        const { username, password, kode } = body;
+        const nama = body.nama?.trim();
+
+        if (!username && !password && !nama && !kode) {
+            return NextResponse.json({ message: "At least one field is required" }, { status: 400 });
+        }
+
+        const targetUser = await prisma.user.findUnique({
+            where: { id },
+            include: {
+                kwaran: true,
+                gugusDepan: true
+            }
+        });
+
+        if (!targetUser) {
+            return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
+
+        if (username && !/^\S+$/.test(username)) {
+            return NextResponse.json({ message: "Username cannot contain spaces" }, { status: 400 });
+        }
+        
+        if (kode && !/^\S+$/.test(kode)) {
+          return NextResponse.json({ message: "Kode cannot contain spaces" }, { status: 400 });
+        }
+
+        if (password && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
+            return NextResponse.json({ message: "Password must be at least 8 characters long, contain uppercase, lowercase letters, and numbers." }, { status: 400 });
+        }
+
+        // hanya creator yang bisa edit akun
+        if (targetUser.createdById !== session.user.id) {
+            return NextResponse.json({ message: "Not creator of this account" }, { status: 403 });
+        }
+
+        // const updateData: Partial<{ username: string; password: string }> = {};
+        const updateData: Partial<User> = {};
+        // let updateData: any = {};
+        if (username) updateData.username = username;
+        
+        if (password) {
+            const hashed = await hash(password, 10);
+            updateData.password = hashed;
+        }
+
+        // update entitas terkait
+        if (session.user.role === Role.USER_KWARCAB && targetUser.kwaran) {
+            await prisma.kwaran.update({
+                where: { kode_kwaran: targetUser.kwaran.kode_kwaran },
+                data: {
+                    ...(nama && { nama_kwaran: nama }),
+                    ...(kode && { kode_kwaran: kode }),
+                }
+            });
+        }
+        
+        else if (session.user.role === Role.USER_KWARAN && targetUser.gugusDepan) {
+            await prisma.gugusDepan.update({
+                where: { kode_gusdep: targetUser.gugusDepan.kode_gusdep },
+                data: {
+                    ...(nama && { nama_gusdep: nama }),
+                    ...(kode && { kode_gusdep: kode }),
+                }
+            });
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: updateData
+        });
+
+        return NextResponse.json({ message: "User updated successfully", user: updatedUser });
+
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    }
+}
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)

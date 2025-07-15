@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 // keperluan testing (nanti dihapus)
-import { getSessionOrToken } from "@/lib/getSessionOrToken";
+// import { getSessionOrToken } from "@/lib/getSessionOrToken";
 
 export async function POST(req: NextRequest) {
     // keperluan testing (nanti dihapus)
@@ -21,8 +21,9 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { username, password, role } = body;
-        const nama = body.nama?.trim(), kode = body.kode?.trim(), kode_kwaran = body.kode_kwaran?.trim(), kode_kwarcab = body.kode_kwarcab?.trim();
+        const { username, password, role, kode, kode_kwaran, kode_kwarcab } = body;
+        const nama = body.nama?.trim();
+        // const nama = body.nama?.trim(), kode_kwaran = body.kode_kwaran?.trim(), kode_kwarcab = body.kode_kwarcab?.trim();
 
         if (!username || !password || !role || !nama || !kode) {
             return NextResponse.json({ message: "All fields are required" }, { status: 400 });
@@ -194,11 +195,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     // untuk keperluan testing (nanti dihapus)
-    const session = await getSessionOrToken(req);
-    console.log("SESSION DEBUG:", session);
+    // const session = await getSessionOrToken(req);
+    // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
-    // const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
   
     if (!session || session.user.role !== "USER_SUPERADMIN") {
         return NextResponse.json({ message: "Unauthorized: Only 'Superadmin' users can retrieve accounts" }, { status: 403 });

@@ -28,9 +28,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { username, password } = body;
-    const nama = body.nama?.trim(),
-      kode = body.kode?.trim();
+    const { username, password, kode } = body;
+    const nama = body.nama?.trim();
 
     if (!username || !password || !nama || !kode) {
       return NextResponse.json(

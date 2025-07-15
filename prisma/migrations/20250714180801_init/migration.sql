@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Anggota" ADD COLUMN     "no_telp" TEXT,
+ALTER COLUMN "tgl_lahir" DROP NOT NULL,
+ALTER COLUMN "agama" DROP NOT NULL,
+ALTER COLUMN "alamat" DROP NOT NULL;

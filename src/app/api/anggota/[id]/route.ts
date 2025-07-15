@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isValidEnum } from "@/lib/helpers/enumValidator";
+import { formatNta } from "@/lib/helpers/format";
 
 // keperluan testing (nanti dihapus)
 // import { getSessionOrToken } from "@/lib/getSessionOrToken";
@@ -42,10 +43,28 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         }
 
         // validasi jika user mengganti nta, pastikan tidak ada duplikasi
-        if (body.nta && body.nta !== anggota.nta) {
-            const existingNTA = await prisma.anggota.findUnique({ where: { nta: body.nta } });
-            if (existingNTA) {
-                return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+        // if (body.nta && body.nta !== anggota.nta) {
+        //     const existingNTA = await prisma.anggota.findUnique({ where: { nta: body.nta } });
+        //     if (existingNTA) {
+        //         return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+        //     }
+        // }
+
+        let formattedNta: string | undefined = undefined;
+        if (body.nta) {
+            const rawNta = body.nta.trim().replace(/\D/g, "");
+
+            if (rawNta.length < 14 || rawNta.length > 16) {
+                return NextResponse.json({ message: "NTA must be 14–16 digit numbers" }, { status: 400 });
+            }
+
+            formattedNta = formatNta(rawNta);
+
+            if (formattedNta !== anggota.nta) {
+                const existingNTA = await prisma.anggota.findUnique({ where: { nta: formattedNta } });
+                if (existingNTA) {
+                    return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+                }
             }
         }
 
@@ -68,11 +87,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             where: { id_anggota: id },
             data: {
                 ...(body.nama_agt?.trim() && { nama_agt: body.nama_agt.trim() }),
-                ...(body.nta?.trim() && { nta: body.nta.trim() }),
+                // ...(body.nta?.trim() && { nta: body.nta.trim() }),
+                ...(formattedNta && { nta: formattedNta }),
                 ...(body.alamat?.trim() && { alamat: body.alamat.trim() }),
                 ...(body.tgl_lahir && { tgl_lahir: new Date(body.tgl_lahir) }),
                 ...(body.gender && { gender: body.gender }),
                 ...(body.agama && { agama: body.agama }),
+                ...(body.no_telp && { no_telp: body.no_telp }),
                 ...(body.status_agt && { status_agt: body.status_agt }),
                 ...(body.tahun_gabung && !isNaN(parseInt(body.tahun_gabung)) && { tahun_gabung: parseInt(body.tahun_gabung) }),
             },

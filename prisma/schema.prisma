@@ -120,11 +120,12 @@ model Anggota {
   id_anggota     String           @id @default(uuid())
   nta            String           @unique
   nama_agt       String
-  tgl_lahir      DateTime
+  tgl_lahir      DateTime?
   tahun_gabung   Int?
   gender         Gender
-  agama          Agama
-  alamat         String
+  agama          Agama?
+  no_telp        String?
+  alamat         String?
   status_agt     StatusKeaktifan
   jenjang_agt    JenjangAnggota?
   gusdepKode     String
@@ -205,20 +206,22 @@ model RiwayatJenjang {
 }
 
 model Ajuan {
-  id_ajuan    String     @id @default(uuid())
-  nama_ajuan  String
-  tingkat     Tingkat
-  formulir    String     @db.Text
-  status      Status?    @default(MENUNGGU)
+  id_ajuan    String         @id @default(uuid())
+  nama_agt    String
+  jenjang_agt JenjangAnggota
+  gender      Gender
+  formulir    String         @db.Text
+  status      Status?        @default(MENUNGGU)
   nta         String?
   gusdepKode  String
-  gugusDepan  GugusDepan @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
+  gugusDepan  GugusDepan     @relation(fields: [gusdepKode], references: [kode_gusdep], onUpdate: Cascade, onDelete: Cascade)
   kwarcabKode String
-  kwarcab     Kwarcab    @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
-  createdAt   DateTime   @default(now())
+  kwarcab     Kwarcab        @relation(fields: [kwarcabKode], references: [kode_kwarcab], onUpdate: Cascade, onDelete: Cascade)
+  createdAt   DateTime       @default(now())
 
-  @@index([nama_ajuan])
+  @@index([nama_agt])
   @@index([status])
+  @@index([createdAt])
   @@index([gusdepKode])
   @@index([kwarcabKode])
 }

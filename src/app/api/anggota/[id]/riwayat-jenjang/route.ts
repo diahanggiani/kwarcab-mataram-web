@@ -10,7 +10,7 @@ import { isValidEnum } from "@/lib/helpers/enumValidator";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
     // keperluan testing (nanti dihapus)
-    // const session = await getSessionOrToken(new NextRequest(req));
+    // const session = await getSessionOrToken(req);
     // console.log("SESSION DEBUG:", session);
 
     // session yang asli (nanti uncomment)
