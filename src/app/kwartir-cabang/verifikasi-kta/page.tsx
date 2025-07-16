@@ -14,13 +14,14 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-// import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 
 type AjuanData = {
   id_ajuan: string;
   jenjang_agt: string;
   nama_agt: string;
   gender: string;
+  keterangan: string | null;
   formulir: string;
   status: string | null;
   nta: string | null;
@@ -51,6 +52,12 @@ export default function VerifikasiKTA() {
     setAjuanList(updated);
   };
 
+  const handleKeteranganChange = (index: number, value: string) => {
+    const updated = [...ajuanList];
+    updated[index].keterangan = value;
+    setAjuanList(updated);
+  };
+
   const handleSingleSubmit = async (ajuan: AjuanData, status: string) => {
     if (!session) return;
 
@@ -66,15 +73,14 @@ export default function VerifikasiKTA() {
         body: JSON.stringify({
           status,
           nta: ajuan.nta,
+          keterangan: ajuan.keterangan || "",
         }),
       });
 
       if (res.ok) {
         toast.success(
           `Ajuan ${ajuan.nama_agt} berhasil ${status.toLowerCase()}!`,
-          {
-            duration: 5000,
-          }
+          { duration: 5000 }
         );
         window.location.reload();
       } else {
@@ -127,7 +133,9 @@ export default function VerifikasiKTA() {
               <TableHead className="text-center text-white">Formulir</TableHead>
               <TableHead className="text-center text-white">Status</TableHead>
               <TableHead className="text-center text-white">NTA</TableHead>
-              {/* <TableHead className="text-center text-white">Keterangan</TableHead> */}
+              <TableHead className="text-center text-white">
+                Keterangan
+              </TableHead>
               <TableHead className="text-center text-white">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -172,31 +180,34 @@ export default function VerifikasiKTA() {
                   </span>
                 </TableCell>
                 <TableCell className="text-center">
-                  <div className="flex flex-col items-center">
-                    <Input
-                      type="text"
-                      value={ajuan.nta || ""}
-                      onChange={(e) => handleNtaChange(index, e.target.value)}
-                      disabled={
-                        ajuan.status === "DITERIMA" ||
-                        ajuan.status === "DITOLAK"
-                      }
-                      minLength={14}
-                      maxLength={16}
-                      className="mx-auto bg-white text-center"
-                      placeholder="Masukan Nomor Tanda Anggota"
-                    />
-                  </div>
+                  <Input
+                    type="text"
+                    value={ajuan.nta || ""}
+                    onChange={(e) => handleNtaChange(index, e.target.value)}
+                    disabled={
+                      ajuan.status === "DITERIMA" || ajuan.status === "DITOLAK"
+                    }
+                    minLength={14}
+                    maxLength={16}
+                    className="mx-auto bg-white text-center"
+                    placeholder="Masukan Nomor Tanda Anggota"
+                  />
                 </TableCell>
-                {/* <TableCell className="text-center">
-                    <div className="flex flex-col items-center">
-                    <Textarea
-                      className="mx-auto bg-white text-center border rounded p-2 resize-none"
-                      placeholder="Masukan Keterangan"
-                      rows={2}
-                    />
-                    </div>
-                </TableCell> */}
+                <TableCell className="text-center">
+                  <Textarea
+                    className="mx-auto bg-white text-center border rounded p-2 resize"
+                    style={{ maxWidth: "250px", width: "100%" }}
+                    placeholder="Masukan Keterangan"
+                    rows={2}
+                    disabled={
+                      ajuan.status === "DITERIMA" || ajuan.status === "DITOLAK"
+                    }
+                    value={ajuan.keterangan || ""}
+                    onChange={(e) =>
+                      handleKeteranganChange(index, e.target.value)
+                    }
+                  />
+                </TableCell>
                 <TableCell className="text-center">
                   <div className="flex justify-center gap-2">
                     <Button
