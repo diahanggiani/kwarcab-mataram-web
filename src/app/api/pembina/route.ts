@@ -99,8 +99,8 @@ export async function GET(req: NextRequest) {
         const searchQuery = searchParams.get("search") || undefined;
 
         // pagination
-        const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "10");
+        // const page = parseInt(searchParams.get("page") || "1");
+        // const limit = parseInt(searchParams.get("limit") || "10");
 
         let gusdepKodeList: string[] = [];
 
@@ -151,8 +151,8 @@ export async function GET(req: NextRequest) {
                   select: { nama_gusdep: true },
                 },
               },
-              skip: (page - 1) * limit,
-              take: limit
+            //   skip: (page - 1) * limit,
+            //   take: limit
             });
         
             const result = pembina.map((pbn) => ({

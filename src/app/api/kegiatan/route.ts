@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    // const { searchParams } = new URL(req.url);
+    // const page = parseInt(searchParams.get("page") || "1");
+    // const limit = parseInt(searchParams.get("limit") || "10");
 
     const formData = await req.formData();
 
@@ -88,8 +88,8 @@ export async function POST(req: NextRequest) {
           },
           select: { id_anggota: true },
           orderBy: { nama_agt: "asc" },
-          skip: (page - 1) * limit,
-          take: limit
+          // skip: (page - 1) * limit,
+          // take: limit
         })
       ).map((a) => a.id_anggota);
 
@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
           },
           select: { id_anggota: true },
           orderBy: { nama_agt: "asc" },
-          skip: (page - 1) * limit,
-          take: limit
+          // skip: (page - 1) * limit,
+          // take: limit
         })
       ).map((a) => a.id_anggota);
 
@@ -118,8 +118,8 @@ export async function POST(req: NextRequest) {
           },
           select: { id_anggota: true },
           orderBy: { nama_agt: "asc" },
-          skip: (page - 1) * limit,
-          take: limit
+          // skip: (page - 1) * limit,
+          // take: limit
         })
       ).map((a) => a.id_anggota);
     }
@@ -214,8 +214,8 @@ export async function GET(req: NextRequest) {
     const searchQuery = searchParams.get("search") || undefined;
         
     // pagination
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    // const page = parseInt(searchParams.get("page") || "1");
+    // const limit = parseInt(searchParams.get("limit") || "10");
 
     let kode_kwaran: string | null = null;
     let kode_gusdep: string | null = null;
@@ -379,8 +379,8 @@ export async function GET(req: NextRequest) {
         tingkat_kegiatan: true,
       },
       orderBy: { tanggal: "desc" },
-      skip: (page - 1) * limit,
-      take: limit
+      // skip: (page - 1) * limit,
+      // take: limit
     });
 
     return NextResponse.json(kegiatanList);

@@ -194,7 +194,7 @@ export default function TambahAnggota() {
                   setAnggota({ ...anggota, no_telp: value });
                 }}
                 maxLength={15}
-                placeholder="Masukkan Nomor Telepon Pembina"
+                placeholder="Masukkan Nomor Telepon Anggota"
                 className="w-full border border-gray-500 rounded-lg px-3 py-2"
               />
             </div>
@@ -243,7 +243,7 @@ export default function TambahAnggota() {
                   <SelectItem value="HINDU">Hindu</SelectItem>
                   <SelectItem value="KATOLIK">Katolik</SelectItem>
                   <SelectItem value="KRISTEN">Kristen</SelectItem>
-                  <SelectItem value="BUDDHA">Budha</SelectItem>
+                  <SelectItem value="BUDDHA">Buddha</SelectItem>
                   <SelectItem value="KONGHUCU">Konghucu</SelectItem>
                 </SelectContent>
               </Select>

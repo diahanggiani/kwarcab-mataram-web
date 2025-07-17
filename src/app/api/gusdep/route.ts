@@ -21,8 +21,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
 
     // pagination
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    // const page = parseInt(searchParams.get("page") || "1");
+    // const limit = parseInt(searchParams.get("limit") || "10");
 
     let kode_kwaran = searchParams.get("kode_kwaran");
     const searchQuery = searchParams.get("search") || undefined;
@@ -57,8 +57,8 @@ export async function GET(req: Request) {
               kwaran: { select: { nama_kwaran: true } },
             },
             orderBy: { nama_gusdep: "asc" },
-            skip: (page - 1) * limit,
-            take: limit
+            // skip: (page - 1) * limit,
+            // take: limit
           });
         return NextResponse.json(gusdepList);
       }
@@ -102,8 +102,8 @@ export async function GET(req: Request) {
         kwaran: { select: { nama_kwaran: true } },
       },
       orderBy: { nama_gusdep: "asc" },
-      skip: (page - 1) * limit,
-      take: limit
+      // skip: (page - 1) * limit,
+      // take: limit
     });
 
     return NextResponse.json(gusdepList);

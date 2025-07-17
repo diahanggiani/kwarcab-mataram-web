@@ -124,8 +124,8 @@ export async function GET(req: NextRequest) {
     const statusFilter = searchParams.get("status");
 
     // pagination
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    // const page = parseInt(searchParams.get("page") || "1");
+    // const limit = parseInt(searchParams.get("limit") || "10");
 
     const validStatuses: ("AKTIF" | "NON_AKTIF" | "ALL")[] = ["AKTIF", "NON_AKTIF", "ALL"];
     const filterStatus: "AKTIF" | "NON_AKTIF" | undefined =
@@ -185,8 +185,8 @@ export async function GET(req: NextRequest) {
           select: { nama_gusdep: true },
         },
       },
-      skip: (page - 1) * limit,
-      take: limit
+      // skip: (page - 1) * limit,
+      // take: limit
     });
 
     const result = anggota.map((agt) => ({

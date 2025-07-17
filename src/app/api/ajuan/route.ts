@@ -133,8 +133,8 @@ export async function GET(req: NextRequest) {
     const statusFilter = searchParams.get("status");
 
     // pagination
-    const page = parseInt(searchParams.get("page") || "1");  // default page is 1
-    const limit = parseInt(searchParams.get("limit") || "10"); // default limit is 10
+    // const page = parseInt(searchParams.get("page") || "1");  // default page is 1
+    // const limit = parseInt(searchParams.get("limit") || "10"); // default limit is 10
 
     const validStatuses: ("DITERIMA" | "DITOLAK" | "MENUNGGU" | "ALL")[] = [
       "DITERIMA", "DITOLAK", "MENUNGGU", "ALL",
@@ -162,8 +162,8 @@ export async function GET(req: NextRequest) {
       ajuanList = await prisma.ajuan.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit, // skip berdasarkan halaman yang diminta
-        take: limit, // ambil data sesuai limit
+        // skip: (page - 1) * limit, // skip berdasarkan halaman yang diminta
+        // take: limit, // ambil data sesuai limit
       });
 
     // user kwarcab lihat semua ajuan yang ditujukan untuknya (gusdep di bawah naungannya)
@@ -177,13 +177,14 @@ export async function GET(req: NextRequest) {
       ajuanList = await prisma.ajuan.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
-        skip: (page - 1) * limit,
-        take: limit
+        // skip: (page - 1) * limit,
+        // take: limit
       });
 
     }
 
-    return NextResponse.json({ data: ajuanList, page, limit });
+    return NextResponse.json({ data: ajuanList });
+    // return NextResponse.json({ data: ajuanList, page, limit });
   } catch (error) {
     console.error("Error viewing form:", error);
     return NextResponse.json(
