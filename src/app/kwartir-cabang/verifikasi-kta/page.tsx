@@ -60,7 +60,7 @@ export default function VerifikasiKTA() {
     }
 
     try {
-      const res = await fetch(`/api/ajuan/${ajuan.id_ajuan}/verify`, {
+      const res = await fetch(`/api/ajuan/${ajuan.id_ajuan}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
