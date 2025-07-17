@@ -119,7 +119,7 @@ export default function TambahKegiatan() {
       selectedParticipants.length === 0 ||
       !selectedFile
     ) {
-      alert("Harap isi semua field yang diperlukan!");
+      toast.error("Harap isi semua field yang diperlukan!");
       return;
     }
 
