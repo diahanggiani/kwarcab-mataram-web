@@ -66,7 +66,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         // hapus user
         await prisma.user.delete({ where: { id } });
 
-        return NextResponse.json({ message: 'User deleted successfully' });
+        return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
 
     } catch (error) {
         console.error('Error deleting user:', error);

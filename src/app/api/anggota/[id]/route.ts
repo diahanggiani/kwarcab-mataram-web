@@ -55,7 +55,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             if (formattedNta !== anggota.nta) {
                 const existingNTA = await prisma.anggota.findUnique({ where: { nta: formattedNta } });
                 if (existingNTA) {
-                    return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+                    return NextResponse.json({ message: "NTA already registered" }, { status: 409 });
                 }
             }
         }

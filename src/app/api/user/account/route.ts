@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { message: "Username already exists" },
-        { status: 400 }
+        { status: 409 }
       );
     }
 
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
           message:
             "This code and name are already taken. Please use different values.",
         },
-        { status: 400 }
+        { status: 409 }
       );
     }
 

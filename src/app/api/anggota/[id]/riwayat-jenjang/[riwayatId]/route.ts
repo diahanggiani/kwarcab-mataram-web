@@ -59,7 +59,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
     });
 
-    return NextResponse.json({ message: "Riwayat jenjang updated successfully", data: updated });
+    return NextResponse.json({ message: "Riwayat jenjang updated successfully", data: updated }, { status: 200 });
   } catch (error) {
     console.error("Error updating data:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

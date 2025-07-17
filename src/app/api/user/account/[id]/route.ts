@@ -76,7 +76,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       if (existingUser && existingUser.id !== id) { // supaya tidak menolak jika user tetap pakai username miliknya sendiri (saat tidak mengubah username)
         return NextResponse.json(
           { message: "Username already exists" },
-          { status: 400 }
+          { status: 409 }
         );
       }
     }
@@ -101,7 +101,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             message:
               "This code and name are already taken. Please use different values.",
           },
-          { status: 400 }
+          { status: 409 }
         );
       }
     }
@@ -172,10 +172,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data: updateData,
     });
 
-    return NextResponse.json({
-      message: "User updated successfully",
-      user: updatedUser,
-    });
+    return NextResponse.json({ message: "User updated successfully", user: updatedUser }, { status: 200 });
   } catch (error) {
     console.error("Error updating user:", error);
     return NextResponse.json(
@@ -260,7 +257,7 @@ export async function DELETE(
     // hapus user
     await prisma.user.delete({ where: { id } });
 
-    return NextResponse.json({ message: "User deleted successfully" });
+    return NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error deleting user:", error);
     return NextResponse.json(

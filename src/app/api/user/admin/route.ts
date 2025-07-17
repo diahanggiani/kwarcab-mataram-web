@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
         const existingUser = await prisma.user.findUnique({ where: { username } });
             if (existingUser) {
-                return NextResponse.json({ message: "Username already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Username already exists" }, { status: 409 });
         }
 
         const hashedPassword = await hash(password, 10);
@@ -63,12 +63,12 @@ export async function POST(req: NextRequest) {
 
             const existingKodeKwarcab = await prisma.kwarcab.findUnique({ where: { kode_kwarcab: kode_kwarcab_baru } });
             if (existingKodeKwarcab) {
-                return NextResponse.json({ message: "Kode Kwarcab already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Kode Kwarcab already exists" }, { status: 409 });
             }
 
             const existingNamaKwarcab = await prisma.kwarcab.findUnique({ where: { nama_kwarcab: nama } });
             if (existingNamaKwarcab) {
-                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 409 });
             }
 
             newUser = await prisma.user.create({
@@ -100,12 +100,12 @@ export async function POST(req: NextRequest) {
 
             const existingKodeKwaran = await prisma.kwaran.findUnique({ where: { kode_kwaran: kode } });
             if (existingKodeKwaran) {
-                return NextResponse.json({ message: "Kode Kwaran already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Kode Kwaran already exists" }, { status: 409 });
             }
 
             const existingNamaKwaran = await prisma.kwaran.findUnique({ where: { nama_kwaran: nama } });
             if (existingNamaKwaran) {
-                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 409 });
             }
 
             newUser = await prisma.user.create({
@@ -148,12 +148,12 @@ export async function POST(req: NextRequest) {
 
             const existingKodeGusdep = await prisma.gugusDepan.findUnique({ where: { kode_gusdep: kode } });
             if (existingKodeGusdep) {
-                return NextResponse.json({ message: "Kode Gugus Depan already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Kode Gugus Depan already exists" }, { status: 409 });
             }
 
             const existingNamaGusdep = await prisma.gugusDepan.findUnique({ where: { nama_gusdep: nama } });
             if (existingNamaGusdep) {
-                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 400 });
+                return NextResponse.json({ message: "Nama Kwarcab already exists" }, { status: 409 });
             }
 
             newUser = await prisma.user.create({

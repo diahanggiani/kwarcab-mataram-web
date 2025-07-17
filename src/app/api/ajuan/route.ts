@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: "Ajuan successfully added", newAjuan }, { status: 200 });
+    return NextResponse.json({ message: "Ajuan successfully added", newAjuan }, { status: 201 });
   } catch (error) {
     console.error("Error submiting form:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

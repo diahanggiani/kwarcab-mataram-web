@@ -72,7 +72,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
       const existing = await prisma.anggota.findUnique({ where: { nta: formattedNta } });
       if (existing) {
-        return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+        return NextResponse.json({ message: "NTA already registered" }, { status: 409 });
       }
 
       // status diterima & nta terisi = otomatis masuk ke daftar anggota

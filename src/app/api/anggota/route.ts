@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     const existingAnggota = await prisma.anggota.findUnique({ where: { nta: formattedNta } });
     if (existingAnggota) {
-      return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+      return NextResponse.json({ message: "NTA already registered" }, { status: 409 });
     }
 
     // format nomor telepon
@@ -139,21 +139,21 @@ export async function GET(req: NextRequest) {
     
     if (session.user.role === "USER_GUSDEP") {
       if (!session.user.kode_gusdep) {
-        return NextResponse.json({ message: "Kode gugus depan tidak ditemukan di session" }, { status: 400 });
+        return NextResponse.json({ message: "Kode gugus depan tidak ditemukan di session" }, { status: 404 });
       }
       // gugus depan hanya bisa melihat anggotanya sendiri
       gusdepKodeList = [session.user.kode_gusdep];
 
     } else if (session.user.role === "USER_KWARAN") {
       if (!session.user.kode_kwaran) {
-        return NextResponse.json({ message: "Kode kwaran tidak ditemukan di session" }, { status: 400 });
+        return NextResponse.json({ message: "Kode kwaran tidak ditemukan di session" }, { status: 404 });
       }
       // kwaran bisa melihat anggota dari gugus depan di bawah naungannya
       gusdepKodeList = await getGusdepKodeByRegion(session.user.kode_kwaran, true);
     
     } else if (session.user.role === "USER_KWARCAB") {
       if (!session.user.kode_kwarcab) {
-        return NextResponse.json({ message: "Kode kwarcab tidak ditemukan di session" }, { status: 400 });
+        return NextResponse.json({ message: "Kode kwarcab tidak ditemukan di session" }, { status: 404 });
       }
       // kwarcab bisa melihat anggota dari gugus depan di bawah naungannya
       gusdepKodeList = await getGusdepKodeByRegion(session.user.kode_kwarcab, false);

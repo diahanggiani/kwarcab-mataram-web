@@ -53,7 +53,7 @@ export async function POST (req: NextRequest) {
 
         const existingPembina = await prisma.pembina.findUnique({ where: { nta: formattedNta } });
         if (existingPembina) {
-            return NextResponse.json({ message: "NTA already registered" }, { status: 400 });
+            return NextResponse.json({ message: "NTA already registered" }, { status: 409 });
         }
 
         // format nomor telepon

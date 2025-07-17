@@ -269,7 +269,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
     });
 
-    return NextResponse.json({ message: "Activity updated successfully", updatedKegiatan });
+    return NextResponse.json({ message: "Activity updated successfully", updatedKegiatan }, { status: 200 });
   } catch (error) {
     console.error("Error updating activity:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
@@ -342,7 +342,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     // hapus kegiatan
     await prisma.kegiatan.delete({ where: { id_kegiatan: id } });
 
-    return NextResponse.json({ message: "Activity deleted successfully" });
+    return NextResponse.json({ message: "Activity deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting activity with ID ${id}:`, error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
