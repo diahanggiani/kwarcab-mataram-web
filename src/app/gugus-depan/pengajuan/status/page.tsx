@@ -63,6 +63,7 @@ type AjuanData = {
   jenjang_agt: string;
   nama_agt: string;
   gender: string;
+  keterangan: string | null;
   formulir: string | null;
   status: string | null;
   nta: string | null;
@@ -213,7 +214,7 @@ export default function StatusPengajuan() {
   }
 
   return (
-    <div className="p-4">
+    <div>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold">
@@ -290,6 +291,9 @@ export default function StatusPengajuan() {
                   Status
                 </TableHead>
                 <TableHead className="text-center font-bold text-base">
+                  Keterangan
+                </TableHead>
+                <TableHead className="text-center font-bold text-base">
                   Aksi
                 </TableHead>
               </TableRow>
@@ -297,8 +301,13 @@ export default function StatusPengajuan() {
             <TableBody>
               {ajuan.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-gray-500">
-                    Tidak ada data pengajuan.
+                  <TableCell
+                    colSpan={10}
+                    className="text-center text-gray-500 py-8"
+                  >
+                    <div className="flex justify-center items-center h-full">
+                      Tidak ada data pengajuan.
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -358,6 +367,9 @@ export default function StatusPengajuan() {
                             : "Menunggu"}
                         </Badge>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {ajuan.keterangan || "-"}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center items-center gap-2">
