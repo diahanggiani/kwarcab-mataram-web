@@ -123,7 +123,7 @@ export default function TambahKegiatan() {
       toast.error("Harap isi semua field yang diperlukan!");
       return;
     }
-    
+
     const wordCount = kegiatan.deskripsi.trim().split(/\s+/).length;
     if (wordCount > 300) {
       toast.error("Deskripsi kegiatan tidak boleh lebih dari 300 kata!");
@@ -168,7 +168,9 @@ export default function TambahKegiatan() {
         setSelectedFile(null);
         setSelectedParticipants([]);
         router.push("/gugus-depan/kegiatan");
-        toast.success("Kegiatan berhasil ditambahkan!");
+        toast.success("Kegiatan berhasil ditambahkan!", {
+          duration: 5000,
+        });
       }
     } catch (error) {
       console.error("Error creating activity:", error);
@@ -308,9 +310,7 @@ export default function TambahKegiatan() {
                 </span>
               </div>
             </div>
-            <h2 className="text-xl font-bold mt-8">
-              Pilih Peserta yang Hadir
-            </h2>
+            <h2 className="text-xl font-bold mt-8">Pilih Peserta yang Hadir</h2>
             <div className="flex relative w-3/10 mt-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input

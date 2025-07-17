@@ -74,7 +74,9 @@ export default function EditProfile() {
 
         setSelectedFile(null);
         router.push("/gugus-depan/profile");
-        toast.success("Profil berhasil diperbaharui!");
+        toast.success("Profil berhasil diperbaharui!", {
+          duration: 5000,
+        });
       } else {
         toast.error("Failed to update profile!");
       }

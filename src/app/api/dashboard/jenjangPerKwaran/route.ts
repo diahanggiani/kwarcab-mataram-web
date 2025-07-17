@@ -3,15 +3,7 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// keperluan testing (nanti dihapus)
-// import { getSessionOrToken } from "@/lib/getSessionOrToken";
-
 export async function GET() {
-  // keperluan testing (nanti dihapus)
-//   const session = await getSessionOrToken(req);
-//   console.log("SESSION DEBUG:", session);
-
-  // session yang asli (nanti uncomment)
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "USER_KWARCAB") {
@@ -41,30 +33,20 @@ export async function GET() {
       select: { kode_kwaran: true, nama_kwaran: true },
     });
 
-    console.log("Kwaran List:", kwaranList); // cek list kwaran
-
     const result = await Promise.all(
       kwaranList.map(async (kwaran) => {
-        // semua gusdep yang ada di bawah kwaran ini
-        const gugusDepanList = await prisma.gugusDepan.findMany({
-          where: { kwaranKode: kwaran.kode_kwaran },
-          select: { kode_gusdep: true },
-        });
-
-        console.log(
-          `Gugus Depan for Kwaran ${kwaran.nama_kwaran}:`,
-          gugusDepanList
-        ); // cek list gusdep
-
-        // semua anggota yang terdaftar di tiap gusdep
-        const anggota = await prisma.anggota.findMany({
+        const anggotaList = await prisma.anggota.findMany({
           where: {
-            gusdepKode: { in: gugusDepanList.map((gd) => gd.kode_gusdep) },
+            gugusDepan: { kwaranKode: kwaran.kode_kwaran },
           },
-          select: { jenjang_agt: true },
+          select: {
+            RiwayatJenjang: {
+              orderBy: { tgl_perubahan: "desc" },
+              take: 1,
+              select: { jenjang_agt: true },
+            },
+          },
         });
-
-        console.log(`Anggota for Kwaran ${kwaran.nama_kwaran}:`, anggota); // cek data anggota
 
         const countPerJenjang: Record<string, number> = {
           SIAGA: 0,
@@ -73,11 +55,11 @@ export async function GET() {
           PANDEGA: 0,
         };
 
-        // total anggota tiap kwaran
-        for (const a of anggota) {
-          if (!a.jenjang_agt) continue; // skip jika anggota tidak memiliki jenjang atau null
+        for (const anggota of anggotaList) {
+          const latestJenjang = anggota.RiwayatJenjang[0]?.jenjang_agt;
+          if (!latestJenjang) continue;
 
-          const jenjangBesar = getJenjangGroup(a.jenjang_agt);
+          const jenjangBesar = getJenjangGroup(latestJenjang);
           if (jenjangBesar) countPerJenjang[jenjangBesar]++;
         }
 

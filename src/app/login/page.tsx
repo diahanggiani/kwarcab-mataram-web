@@ -30,7 +30,8 @@ export default function LoginPage() {
     const passwordValidation = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordValidation.test(data.password)) {
       toast.error(
-        "Kata sandi harus terdiri dari minimal 8 karakter, dimulai dengan huruf kapital, dan mengandung angka."
+        "Kata sandi harus terdiri dari minimal 8 karakter, dimulai dengan huruf kapital, dan mengandung angka.",
+        { duration: 5000 }
       );
       return;
     }
@@ -41,7 +42,7 @@ export default function LoginPage() {
       redirect: false,
     });
     if (signInResponse?.ok) {
-      toast.success("Login berhasil!");
+      toast.success("Login berhasil!", { duration: 5000 });
       const session = await getSession();
       if (session?.user.role === "USER_SUPERADMIN") {
         router.replace("/super-admin");

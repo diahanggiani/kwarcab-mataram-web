@@ -1,6 +1,15 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Layers, Loader2, MapPin, Pencil, PlusCircle, Search, Trash2 } from "lucide-react";
+import {
+  Eye,
+  Layers,
+  Loader2,
+  MapPin,
+  Pencil,
+  PlusCircle,
+  Search,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -104,7 +113,9 @@ export default function Kegiatan() {
       setKegiatan(updateKegiatan);
       setDeleteId(null);
       setIsDeleteOpen(false);
-      toast.success("Kegiatan berhasil dihapus!");
+      toast.success("Kegiatan berhasil dihapus!", {
+        duration: 5000,
+      });
     }
   };
 

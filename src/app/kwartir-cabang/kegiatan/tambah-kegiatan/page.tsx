@@ -161,7 +161,8 @@ export default function TambahKegiatan() {
         setSelectedFile(null);
         setSelectedParticipants([]);
         router.push("/kwartir-cabang/kegiatan");
-        toast.success("Kegiatan berhasil ditambahkan!");
+        toast.success("Kegiatan berhasil ditambahkan!", {
+          duration: 5000,});
       }
     } catch (error) {
       console.error("Error creating activity:", error);

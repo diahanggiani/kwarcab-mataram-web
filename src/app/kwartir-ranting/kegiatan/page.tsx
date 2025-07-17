@@ -1,6 +1,15 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Layers, Loader2, MapPin, Pencil, PlusCircle, Search, Trash2 } from "lucide-react";
+import {
+  Eye,
+  Layers,
+  Loader2,
+  MapPin,
+  Pencil,
+  PlusCircle,
+  Search,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -103,7 +112,9 @@ export default function Kegiatan() {
       setKegiatan(updateKegiatan);
       setDeleteId(null);
       setIsDeleteOpen(false);
-      toast.success("Kegiatan berhasil dihapus!");
+      toast.success("Kegiatan berhasil dihapus!", {
+        duration: 5000,
+      });
     }
   };
 
@@ -148,7 +159,7 @@ export default function Kegiatan() {
           />
         </div>
 
-        <Link href="/gugus-depan/kegiatan/tambah-kegiatan">
+        <Link href="/kwartir-ranting/kegiatan/tambah-kegiatan">
           <Button
             size="sm"
             className="bg-amber-950 text-white text-sm rounded-md hover:bg-gray-900 transition"

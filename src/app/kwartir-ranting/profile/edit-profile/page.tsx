@@ -72,7 +72,9 @@ export default function EditProfile() {
         setProfile(data);
         setSelectedFile(null);
         router.push("/kwartir-ranting/profile");
-        toast.success("Profil berhasil diperbarui!");
+        toast.success("Profil berhasil diperbarui!", {
+          duration: 5000,
+        });
       }
     } catch (error) {
       console.error("Error updating profile:", error);

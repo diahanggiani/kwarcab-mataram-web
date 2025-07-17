@@ -87,7 +87,9 @@ export default function Profile() {
       setIsUbahOpen(false);
       setCurrentPassword("");
       setNewPassword("");
-      toast.success("Password berhasil diubah!");
+      toast.success("Password berhasil diubah!", {
+        duration: 5000,
+      });
     } else {
       const error = await res.json();
       alert(

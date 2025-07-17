@@ -135,7 +135,6 @@ export default function Dashboard() {
         const res = await fetch("/api/dashboard/gusdepByKwaran");
         if (res.ok) {
           const data = await res.json();
-          console.log("Gugusdepan Data:", data);
           setGugusdepanData(data);
         }
       }
@@ -156,6 +155,7 @@ export default function Dashboard() {
         const res = await fetch("/api/dashboard/jenjangPerKwaran");
         if (res.ok) {
           const data = await res.json();
+          console.log("Jenjang Per Kwaran:", data);
           setJenjangPerKwaran(data);
         }
       }
