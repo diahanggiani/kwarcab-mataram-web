@@ -88,6 +88,7 @@ export default function TambahPembina() {
           nta,
           tgl_lahir,
           alamat,
+          no_telp,
           gender,
           agama,
           jenjang_pbn,
@@ -237,7 +238,7 @@ export default function TambahPembina() {
                 }
               >
                 <SelectTrigger className="w-full border border-gray-500 rounded-lg px-3 py-2">
-                  <SelectValue placeholder="Pilih Gugus Depan" />
+                  <SelectValue placeholder="Pilih Jenjang" />
                 </SelectTrigger>
                 <SelectContent className="w-full bg-white">
                   <SelectItem value="SIAGA">Siaga</SelectItem>

@@ -15,6 +15,17 @@ import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 type AjuanData = {
   id_ajuan: string;
@@ -31,6 +42,7 @@ export default function VerifikasiKTA() {
   const { data: session } = useSession();
   const [ajuanList, setAjuanList] = useState<AjuanData[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [selectedAjuan, setSelectedAjuan] = useState<AjuanData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,19 +235,50 @@ export default function VerifikasiKTA() {
                       <Check className="w-4 h-4 mr-1" />
                       DITERIMA
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => handleSingleSubmit(ajuan, "DITOLAK")}
-                      className="bg-red-600 hover:bg-red-700 text-white transition-colors"
-                      disabled={
-                        ajuan.status === "DITERIMA" ||
-                        ajuan.status === "DITOLAK"
-                      }
-                    >
-                      <X className="w-4 h-4 mr-1" />
-                      DITOLAK
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="bg-red-600 hover:bg-red-700 text-white transition-colors"
+                          disabled={
+                            ajuan.status === "DITERIMA" ||
+                            ajuan.status === "DITOLAK"
+                          }
+                          onClick={() => setSelectedAjuan(ajuan)}
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          DITOLAK
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Konfirmasi Penolakan
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Apakah kamu yakin ingin <strong>menolak</strong>{" "}
+                            ajuan dari{" "}
+                            <strong>{selectedAjuan?.nama_agt}</strong>? <br />
+                            Tindakan ini tidak dapat dibatalkan.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              if (selectedAjuan) {
+                                handleSingleSubmit(selectedAjuan, "DITOLAK");
+                                setSelectedAjuan(null);
+                              }
+                            }}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            Ya, Tolak
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </TableCell>
               </TableRow>
